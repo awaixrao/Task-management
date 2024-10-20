@@ -1,0 +1,11 @@
+/* styles.css or relevant CSS file */
+.ant-layout-header {
+    display: flex;
+    justify-content: space-between; /* Distribute space between logo and menu */
+    align-items: center; /* Align items vertically centered */
+  }
+  
+  .ant-menu {
+    margin: 0; /* Reset margin */
+  }
+  

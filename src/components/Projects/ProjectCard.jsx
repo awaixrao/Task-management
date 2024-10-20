@@ -1,0 +1,12 @@
+import React from 'react';
+import { Card } from 'antd';
+
+const ProjectCard = ({ title, description }) => {
+  return (
+    <Card title={title} hoverable style={{ width: '100%' }}>
+      <p>{description}</p>
+    </Card>
+  );
+};
+
+export default ProjectCard;
