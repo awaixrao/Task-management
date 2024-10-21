@@ -1,31 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, Alert } from 'antd';
-import { fetchProjects } from '../../features/projects/projectSlice';
+import { fetchProjects, createProject } from '../../features/projects/projectSlice';
 import ProjectList from '../../components/Projects/ProjectList';
 import NewProjectForm from '../../components/Projects/ProjectForm';
+import { setUserRole } from '../../features/auth/AuthSlice';
 
 const ProjectsPage = () => {
-  const [showForm, setShowForm] = useState(false); // Toggle form visibility
+  const [showForm, setShowForm] = useState(false);
   const dispatch = useDispatch();
 
-  const { role } = useSelector((state) => state.auth); // Get the user role from Redux state
-  const { projects, loading, error } = useSelector((state) => state.projects); // Fetch projects state
-
-  const handleCreateProject = () => {
-    setShowForm((prev) => !prev); // Toggle the project form display
-  };
+  const { role } = useSelector((state) => state.auth);
+  const { projects, loading, error } = useSelector((state) => state.projects);
 
   useEffect(() => {
-    dispatch(fetchProjects()); // Fetch projects when component mounts
+    const storedRole = localStorage.getItem('userRole');
+    if (storedRole && !role) {
+      dispatch(setUserRole(storedRole));
+    }
+  }, [dispatch, role]);
+
+  useEffect(() => {
+    dispatch(fetchProjects());
   }, [dispatch]);
 
-  const handleFormSubmit = async () => {
-    await dispatch(fetchProjects()); // Re-fetch projects after a new one is created
+  const handleCreateProject = () => {
+    setShowForm((prev) => !prev);
   };
 
-  // Safely access the project array if the data structure exists
-  const projectArray = projects?.data?.data || [];
+  const handleFormSubmit = async (projectData) => {
+    const resultAction = await dispatch(createProject(projectData));
+  
+    if (createProject.fulfilled.match(resultAction)) {
+      // Successfully created project
+      await dispatch(fetchProjects()); // Refetch projects after creation
+      setShowForm(false); // Hide the form
+      dispatch(clearError()); // Clear any existing errors after successful creation
+    } else {
+      // Log and handle the error here if necessary
+      console.error('Failed to create project:', resultAction.error);
+    }
+  };
+  
+
+  const projectArray = projects?.data?.data || []; // Adjust as per your API response structure
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -53,14 +71,13 @@ const ProjectsPage = () => {
 
       {showForm && role === 'admin' && (
         <div className="mb-6 p-4 border border-gray-300 rounded-lg shadow-md">
-          <NewProjectForm onSubmit={handleFormSubmit} /> {/* Pass handleFormSubmit to NewProjectForm */}
+          <NewProjectForm onSubmit={handleFormSubmit} />
         </div>
       )}
 
-      {/* Only show the ProjectList if not loading and there's no error */}
       {!loading && !error && (
         <div className="project-list">
-          <ProjectList projects={projectArray} /> {/* Pass the correct array */}
+          <ProjectList projects={projectArray} />
         </div>
       )}
     </div>

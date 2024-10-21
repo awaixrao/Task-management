@@ -9,8 +9,11 @@ import SignupPage from './pages/Signup/SignupPage'; // Example login page
 
 import ProtectedRoute from './utils/ProtectedRoute '
 import UserManagementPage from './pages/userManagement/UserManagementPage';
+import ProfileUpdatePage from './pages/profile/ProfileUpdatePage';
 
 const App = () => {
+
+  
   return (
     <Routes>
       {/* Public routes */}
@@ -22,6 +25,7 @@ const App = () => {
         <Route path="dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
         <Route path="projects" element={<ProtectedRoute element={<ProjectsPage />} />} />
         <Route path="users" element={<ProtectedRoute element={<UserManagementPage />} />} />
+        <Route path="profile" element={<ProtectedRoute element={<ProfileUpdatePage />} />} />
 
       </Route>
     </Routes>

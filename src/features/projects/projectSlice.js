@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'https://task-manager.codionslab.com/api/v1/admin/project'; // Updated API URL
+const API_URL = 'https://task-manager.codionslab.com/api/v1/admin/project'; 
 
 // Async thunk for fetching projects
 export const fetchProjects = createAsyncThunk(
@@ -15,10 +15,8 @@ export const fetchProjects = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      console.log('Fetched Projects:', response.data);
-      return response.data;
+      return response.data; // Ensure this matches the expected structure
     } catch (error) {
-      console.error('Error fetching projects:', error.response?.data);
       return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
     }
   }
@@ -36,10 +34,8 @@ export const createProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      console.log('Created Project:', response.data);
-      return response.data;
+      return response.data; // Ensure this matches the expected structure
     } catch (error) {
-      console.error('Error creating project:', error.response?.data);
       return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
     }
   }
@@ -57,10 +53,8 @@ export const updateProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      console.log('Updated Project:', response.data);
-      return response.data;
+      return response.data; // Ensure this matches the expected structure
     } catch (error) {
-      console.error('Error updating project:', error.response?.data);
       return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
     }
   }
@@ -78,10 +72,8 @@ export const deleteProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      console.log(`Deleted Project ID: ${id}`);
-      return id;
+      return id; // Return the id of the deleted project for filtering
     } catch (error) {
-      console.error('Error deleting project:', error.response?.data);
       return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
     }
   }
@@ -99,36 +91,41 @@ const projectSlice = createSlice({
   initialState,
   reducers: {
     clearError: (state) => {
-      state.error = null;
+      state.error = null; // Clear error when called
     },
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Projects
       .addCase(fetchProjects.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchProjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects = action.payload;
-        console.log('Projects in Redux Store:', state.projects);
+        state.projects = action.payload; // Ensure this is the correct structure
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+      
+      // Create Project
       .addCase(createProject.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects.push(action.payload);
+        console.log('Newly created project:', action.payload); // Log the response to see its structure
+        state.projects.push(action.payload); // Ensure this matches your UI structure
       })
       .addCase(createProject.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload; // Set error message
       })
+      
+      // Update Project
       .addCase(updateProject.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -137,29 +134,32 @@ const projectSlice = createSlice({
         state.loading = false;
         const index = state.projects.findIndex((project) => project.id === action.payload.id);
         if (index !== -1) {
-          state.projects[index] = action.payload;
+          state.projects[index] = action.payload; // Update the project in the array
         }
       })
       .addCase(updateProject.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload; // Set error message
       })
+      
+      // Delete Project
       .addCase(deleteProject.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(deleteProject.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects = state.projects.filter((project) => project.id !== action.payload);
+        state.projects = state.projects.filter((project) => project.id !== action.payload); // Remove the deleted project
       })
       .addCase(deleteProject.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload; // Set error message
       });
   },
 });
 
 // Export the action to clear errors
 export const { clearError } = projectSlice.actions;
+
 // Export the reducer
 export default projectSlice.reducer;

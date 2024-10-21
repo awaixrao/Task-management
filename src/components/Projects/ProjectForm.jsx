@@ -25,8 +25,8 @@ const NewProjectForm = () => {
       className="new-project-form"
     >
       <Form.Item
-        label="Project Title"
-        name="title"
+        label="Project Name"
+        name="name"
         rules={[{ required: true, message: 'Please enter a project title' }]}
       >
         <Input placeholder="Enter project title" />

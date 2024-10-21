@@ -92,15 +92,16 @@ const UserManagementPage = () => {
   };
 
   return (
-    <div>
-      <h1 className='text-4xl pb-3'>User Management</h1>
-      <Button
-  className="bg-blue-500 flex justify-end hover:bg-blue-600 text-white font-semibold py-3 px-6 text-lg rounded transition duration-300 ease-in-out" // Increased padding and font size
-  onClick={openAddUserModal}
->
-  Add User
-</Button>
-
+    <div className="container mx-auto p-4">
+      <h1 className="text-xl font-bold mb-4">User Management</h1>
+      <div className="flex justify-end mb-4">
+        <Button
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 text-lg rounded transition duration-300 ease-in-out"
+          onClick={openAddUserModal}
+        >
+          Add User
+        </Button>
+      </div>
 
       {loading ? (
         <p>Loading users...</p>
@@ -109,13 +110,14 @@ const UserManagementPage = () => {
           {users.length > 0 ? (
             <>
               <UserList users={users} onEdit={openEditUserModal} onDelete={handleDeleteUser} />
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={totalUsers}
-                onChange={handlePageChange}
-                style={{ marginTop: '20px' }}
-              />
+              <div className="flex justify-center mt-4">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={totalUsers}
+                  onChange={handlePageChange}
+                />
+              </div>
             </>
           ) : (
             <p>No users found.</p>

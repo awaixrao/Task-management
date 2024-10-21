@@ -1,4 +1,4 @@
-// src/features/auth/AuthSlice.js
+// src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -22,8 +22,10 @@ export const loginUser = createAsyncThunk(
         throw new Error('Token not found in response');
       }
 
-      // Store token in localStorage for session persistence
+      // Store token and user role in localStorage for session persistence
       localStorage.setItem('token', token);
+      localStorage.setItem('userRole', user.role); // Store role
+      localStorage.setItem('user', JSON.stringify(user)); // Store user data
 
       // Return user, token, and role for updating Redux state
       return { user, token, role: user.role };
@@ -49,10 +51,11 @@ export const register = createAsyncThunk(
 
       const { token, user } = response.data.data;
 
-      // Store token in localStorage for session persistence
+      // Store token and user data in localStorage for session persistence
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user)); // Store user data
 
-      return { user, token };
+      return { user, token, role: user.role }; // Return role as well
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: 'An unknown error occurred' }
@@ -65,7 +68,7 @@ export const register = createAsyncThunk(
 const initialState = {
   user: JSON.parse(localStorage.getItem('user')) || null, // Load user from localStorage
   token: localStorage.getItem('token') || null, // Load token from localStorage
-  role: null,
+  role: localStorage.getItem('userRole') || null, // Load role from localStorage
   loading: false,
   error: null,
 };
@@ -80,9 +83,14 @@ const authSlice = createSlice({
       state.role = null;
       localStorage.removeItem('token'); // Clear token from localStorage
       localStorage.removeItem('user'); // Clear user from localStorage
+      localStorage.removeItem('userRole'); // Clear user role from localStorage
     },
     clearError: (state) => {
       state.error = null;
+    },
+    setUserRole: (state, action) => {
+      state.role = action.payload; // Update role in the state
+      localStorage.setItem('userRole', action.payload); // Also update localStorage
     },
   },
   extraReducers: (builder) => {
@@ -95,8 +103,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
-        state.role = action.payload.role;
+        state.role = action.payload.role; // Set role from payload
         localStorage.setItem('user', JSON.stringify(action.payload.user)); // Store user in localStorage
+        localStorage.setItem('userRole', action.payload.role); // Store role in localStorage
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -110,7 +119,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.role = action.payload.role; // Set role from payload
         localStorage.setItem('user', JSON.stringify(action.payload.user)); // Store user in localStorage
+        localStorage.setItem('userRole', action.payload.role); // Store role in localStorage
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
@@ -119,5 +130,8 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+// Export actions
+export const { logout, clearError, setUserRole } = authSlice.actions;
+
+// Export reducer
 export default authSlice.reducer;

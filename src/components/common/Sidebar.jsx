@@ -41,23 +41,23 @@ const Sidebar = () => {
     {
       key: 'projects',
       icon: <ProjectOutlined />,
-      label: <Link to="/projects">Projects</Link>,
+      label: <Link to="/projects">Manage Projects</Link>,
     },
     {
       key: 'tasks',
       icon: <ContainerOutlined />,
-      label: <Link to="/tasks">Tasks</Link>,
+      label: <Link to="/tasks">Manage Tasks</Link>,
     },
     // Conditionally render Users menu item based on role
     user && user.role === 'admin' ? {
       key: 'users',
       icon: <UserOutlined />,
-      label: <Link to="/users">Users</Link>,
+      label: <Link to="/users">Manage Users</Link>,
     } : null,
     {
       key: 'profile',
       icon: <ProfileOutlined />,
-      label: <Link to="/profile">Profile</Link>,
+      label: <Link to="/profile"> Manage Profile</Link>,
     },
   ].filter(Boolean); // Filter out any null values
 

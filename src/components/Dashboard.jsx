@@ -11,19 +11,19 @@ const DashboardPage = () => {
   return (
     <div className="dashboard-page">
       {/* Dashboard Header */}
-      <section className="hero bg-blue-600 text-white text-center p-10">
+      <section className="bg-blue-600 text-white text-center p-10">
         <h1 className="text-4xl font-bold">Dashboard</h1>
         <p className="mt-4">Overview of your tasks and projects at a glance</p>
       </section>
 
       {/* Dashboard Content */}
-      <section className="dashboard-content py-10">
+      <section className="py-10">
         <Row gutter={[16, 16]}>
           {/* Projects Overview */}
-          <Col xs={24} md={8}>
+          <Col xs={24} sm={12} md={8}>
             <Link to="/projects">
-              <Card className="dashboard-card" hoverable>
-                <div className="card-content flex items-center">
+              <Card className="hover:shadow-lg transition-shadow duration-300" hoverable>
+                <div className="flex items-center p-4">
                   <ProjectOutlined className="text-3xl mr-4" />
                   <div>
                     <h3 className="font-bold text-lg">Projects</h3>
@@ -35,10 +35,10 @@ const DashboardPage = () => {
           </Col>
 
           {/* Tasks Overview */}
-          <Col xs={24} md={8}>
+          <Col xs={24} sm={12} md={8}>
             <Link to="/tasks">
-              <Card className="dashboard-card" hoverable>
-                <div className="card-content flex items-center">
+              <Card className="hover:shadow-lg transition-shadow duration-300" hoverable>
+                <div className="flex items-center p-4">
                   <ContainerOutlined className="text-3xl mr-4" />
                   <div>
                     <h3 className="font-bold text-lg">Tasks</h3>
@@ -50,11 +50,11 @@ const DashboardPage = () => {
           </Col>
 
           {/* Users Overview (Admin Only) */}
-          {role === 'admin' && ( // Conditionally render this section based on role
-            <Col xs={24} md={8}>
+          {role === 'admin' && (
+            <Col xs={24} sm={12} md={8}>
               <Link to="/users">
-                <Card className="dashboard-card" hoverable>
-                  <div className="card-content flex items-center">
+                <Card className="hover:shadow-lg transition-shadow duration-300" hoverable>
+                  <div className="flex items-center p-4">
                     <UserOutlined className="text-3xl mr-4" />
                     <div>
                       <h3 className="font-bold text-lg">Users</h3>
@@ -69,10 +69,9 @@ const DashboardPage = () => {
       </section>
 
       {/* Recent Activity */}
-      <section className="recent-activity py-10">
+      <section className="py-10">
         <h2 className="text-2xl mb-6 text-center">Recent Activity</h2>
-        {/* This can be a list of recent tasks, comments, or project updates */}
-        <div className="activity-list">
+        <div className="text-center">
           <p>No recent activity yet. Start working on your tasks!</p>
         </div>
       </section>
