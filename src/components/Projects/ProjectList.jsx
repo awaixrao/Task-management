@@ -1,20 +1,17 @@
 import React from 'react';
-import { Row, Col } from 'antd';
-import ProjectCard from './ProjectCard';
+import ProjectCard from './ProjectCard'; // Import your ProjectCard component
+import { Row, Col } from 'antd'; // For responsive layout
 
-const projectsData = [
-  { id: 1, title: 'Project 1', description: 'This is project 1' },
-  { id: 2, title: 'Project 2', description: 'This is project 2' },
-  { id: 3, title: 'Project 3', description: 'This is project 3' },
-  // Add more sample projects here
-];
+const ProjectList = ({ projects }) => {
+  if (!projects.length) {
+    return <p>No projects found.</p>;
+  }
 
-const ProjectList = () => {
   return (
-    <Row gutter={[16, 16]}>
-      {projectsData.map((project) => (
+    <Row gutter={[16, 16]} justify="center"> {/* Use Ant Design's Row and Col for layout */}
+      {projects.map((project) => (
         <Col key={project.id} xs={24} sm={12} md={8} lg={6}>
-          <ProjectCard title={project.title} description={project.description} />
+          <ProjectCard title={project.name} description={project.description} />
         </Col>
       ))}
     </Row>

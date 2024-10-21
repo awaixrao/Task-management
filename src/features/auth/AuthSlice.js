@@ -1,3 +1,4 @@
+// src/features/auth/AuthSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -8,18 +9,28 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (userData, { rejectWithValue }) => {
     try {
-      console.log('Attempting login with:', userData); 
       const response = await axios.post(`${API_URL}/login`, userData, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
       });
-      console.log('Login successful:', response.data);
-      return response.data;
+
+      const { token, user } = response.data.data;
+
+      if (!token) {
+        throw new Error('Token not found in response');
+      }
+
+      // Store token in localStorage for session persistence
+      localStorage.setItem('token', token);
+
+      // Return user, token, and role for updating Redux state
+      return { user, token, role: user.role };
     } catch (error) {
-      console.error('Login error:', error); 
-      return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
+      return rejectWithValue(
+        error.response?.data || { message: 'An unknown error occurred' }
+      );
     }
   }
 );
@@ -35,25 +46,40 @@ export const register = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       });
-      return response.data;
+
+      const { token, user } = response.data.data;
+
+      // Store token in localStorage for session persistence
+      localStorage.setItem('token', token);
+
+      return { user, token };
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
+      return rejectWithValue(
+        error.response?.data || { message: 'An unknown error occurred' }
+      );
     }
   }
 );
 
+// Initial state
+const initialState = {
+  user: JSON.parse(localStorage.getItem('user')) || null, // Load user from localStorage
+  token: localStorage.getItem('token') || null, // Load token from localStorage
+  role: null,
+  loading: false,
+  error: null,
+};
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: null,
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.role = null;
+      localStorage.removeItem('token'); // Clear token from localStorage
+      localStorage.removeItem('user'); // Clear user from localStorage
     },
     clearError: (state) => {
       state.error = null;
@@ -69,6 +95,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.role = action.payload.role;
+        localStorage.setItem('user', JSON.stringify(action.payload.user)); // Store user in localStorage
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -82,6 +110,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        localStorage.setItem('user', JSON.stringify(action.payload.user)); // Store user in localStorage
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;

@@ -3,8 +3,11 @@ import React from 'react';
 import { Card, Col, Row } from 'antd';
 import { Link } from 'react-router-dom';
 import { ProjectOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
 
 const DashboardPage = () => {
+  const { role } = useSelector((state) => state.auth); // Get the role from Redux state
+
   return (
     <div className="dashboard-page">
       {/* Dashboard Header */}
@@ -47,19 +50,21 @@ const DashboardPage = () => {
           </Col>
 
           {/* Users Overview (Admin Only) */}
-          <Col xs={24} md={8}>
-            <Link to="/users">
-              <Card className="dashboard-card" hoverable>
-                <div className="card-content flex items-center">
-                  <UserOutlined className="text-3xl mr-4" />
-                  <div>
-                    <h3 className="font-bold text-lg">Users</h3>
-                    <p>Manage users and roles (Admin Only)</p>
+          {role === 'admin' && ( // Conditionally render this section based on role
+            <Col xs={24} md={8}>
+              <Link to="/users">
+                <Card className="dashboard-card" hoverable>
+                  <div className="card-content flex items-center">
+                    <UserOutlined className="text-3xl mr-4" />
+                    <div>
+                      <h3 className="font-bold text-lg">Users</h3>
+                      <p>Manage users and roles (Admin Only)</p>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            </Link>
-          </Col>
+                </Card>
+              </Link>
+            </Col>
+          )}
         </Row>
       </section>
 

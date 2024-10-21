@@ -1,43 +1,68 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux'; // To access the role from Redux
-import { Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Button, Alert } from 'antd';
+import { fetchProjects } from '../../features/projects/projectSlice';
 import ProjectList from '../../components/Projects/ProjectList';
 import NewProjectForm from '../../components/Projects/ProjectForm';
 
 const ProjectsPage = () => {
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(false); // Toggle form visibility
+  const dispatch = useDispatch();
 
-  // Fetch the user role from the Redux store
-  const { role } = useSelector((state) => state.auth);
+  const { role } = useSelector((state) => state.auth); // Get the user role from Redux state
+  const { projects, loading, error } = useSelector((state) => state.projects); // Fetch projects state
 
   const handleCreateProject = () => {
-    setShowForm(!showForm);
+    setShowForm((prev) => !prev); // Toggle the project form display
   };
 
-  return (
-    <div className="projects-page">
-      <div className="projects-header">
-        <h1 className="text-3xl font-bold mb-4">Projects</h1>
+  useEffect(() => {
+    dispatch(fetchProjects()); // Fetch projects when component mounts
+  }, [dispatch]);
 
-        {/* Conditionally render the "Create New Project" button only if the user is an admin */}
+  const handleFormSubmit = async () => {
+    await dispatch(fetchProjects()); // Re-fetch projects after a new one is created
+  };
+
+  // Safely access the project array if the data structure exists
+  const projectArray = projects?.data?.data || [];
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold">Projects</h1>
+
         {role === 'admin' && (
-          <Button type="primary" onClick={handleCreateProject}>
+          <Button
+            type="primary"
+            onClick={handleCreateProject}
+            className="mt-4"
+          >
             {showForm ? 'Cancel' : 'Create New Project'}
           </Button>
         )}
       </div>
 
-      {/* Conditionally show the form for creating new projects if the user is an admin */}
-      {showForm && role === 'admin' && (
-        <div className="new-project-form">
-          <NewProjectForm />
+      {loading && (
+        <div className="flex justify-center items-center h-32">
+          <p className="text-lg font-semibold">Loading projects...</p>
         </div>
       )}
 
-      {/* Display the project list for all users */}
-      <div className="project-list">
-        <ProjectList />
-      </div>
+      {error && <Alert message={error.message} type="error" showIcon />}
+
+      {showForm && role === 'admin' && (
+        <div className="mb-6 p-4 border border-gray-300 rounded-lg shadow-md">
+          <NewProjectForm onSubmit={handleFormSubmit} /> {/* Pass handleFormSubmit to NewProjectForm */}
+        </div>
+      )}
+
+      {/* Only show the ProjectList if not loading and there's no error */}
+      {!loading && !error && (
+        <div className="project-list">
+          <ProjectList projects={projectArray} /> {/* Pass the correct array */}
+        </div>
+      )}
     </div>
   );
 };

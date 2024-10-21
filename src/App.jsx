@@ -1,28 +1,31 @@
+// src/App.jsx
+import React from 'react';
+import {  Routes, Route } from 'react-router-dom';
+import MainOutlet from './MainOutlet'; // Main layout
+import DashboardPage from './pages/Home/HomePage'; // Dashboard content
+import ProjectsPage from './pages/ProjectPage/ProjectPage.'; // Another page
+import LoginPage from './pages/Login/LoginPage'; // Example login page
+import SignupPage from './pages/Signup/SignupPage'; // Example login page
 
-import './App.css'
-import LoginPage from './pages/Login/LoginPage'
-import { Routes,Route } from 'react-router-dom';
-import SignupPage from './pages/Signup/SignupPage';
-import DashboardPage from './pages/Home/HomePage';
-import ProjectsPage from './pages/ProjectPage/ProjectPage.';
+import ProtectedRoute from './utils/ProtectedRoute '
+import UserManagementPage from './pages/userManagement/UserManagementPage';
 
-
-function App() {
- 
-
+const App = () => {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
+    <Routes>
+      {/* Public routes */}
+      <Route path="login" element={<ProtectedRoute element={<LoginPage />} isPublic={true} />} />
+      <Route path="signup" element={<ProtectedRoute element={<SignupPage />} isPublic={true} />} />
 
+      {/* Routes that use MainOutlet for common layout */}
+      <Route path="/"  element={<ProtectedRoute element={<MainOutlet />}/>}>
+        <Route path="dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
+        <Route path="projects" element={<ProtectedRoute element={<ProjectsPage />} />} />
+        <Route path="users" element={<ProtectedRoute element={<UserManagementPage />} />} />
 
-      </Routes>
-    </>
+      </Route>
+    </Routes>
+  );
+};
 
-  )
-}
-
-export default App
+export default App;
