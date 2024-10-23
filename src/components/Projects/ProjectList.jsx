@@ -1,14 +1,12 @@
+// src/components/Projects/ProjectList.jsx
 import React from 'react';
 import { Table, Button, Popconfirm } from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-  TeamOutlined,
-  FileDoneOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, TeamOutlined, FileDoneOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-const ProjectList = ({ projects, onDetail, onEdit, onDelete, onAssign, role }) => {
-  // Define the columns for the project table
+const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const columns = [
     {
       title: 'Name',
@@ -19,32 +17,37 @@ const ProjectList = ({ projects, onDetail, onEdit, onDelete, onAssign, role }) =
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
-      ellipsis: true, // Truncate long text
+      ellipsis: true,
     },
     {
       title: 'Created At',
-      dataIndex: 'created_at', // Adjust this to match your actual API response
+      dataIndex: 'created_at',
       key: 'created_at',
-      render: (text) => new Date(text).toLocaleDateString(), // Format date as needed
+      render: (text) => new Date(text).toLocaleDateString(),
     },
     {
       title: 'Actions',
       render: (_, project) => (
         <div>
-          {/* Show edit button only for admin role */}
-          {role === 'admin' && (
+          {/* Always show the detail button and navigate to /tasks */}
+          <Button
+            type="default"
+            icon={<FileDoneOutlined />}
+            onClick={() => navigate(`/tasks/${project.id}`)} // Navigate to /tasks/:id
+            style={{ marginRight: '8px' }}
+          />
+          {onEdit && (
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => onEdit(project)} // Pass the entire project object
+              onClick={() => onEdit(project)}
               style={{ marginRight: '8px' }}
             />
           )}
-          {/* Show delete button only for admin role */}
-          {role === 'admin' && (
+          {onDelete && (
             <Popconfirm
               title="Are you sure to delete this project?"
-              onConfirm={() => onDelete(project.id)} // Handle project deletion
+              onConfirm={() => onDelete(project.id)}
               okText="Yes"
               cancelText="No"
             >
@@ -55,19 +58,11 @@ const ProjectList = ({ projects, onDetail, onEdit, onDelete, onAssign, role }) =
               />
             </Popconfirm>
           )}
-          {/* Show detail button for all roles */}
-          <Button
-            type="default"
-            icon={<FileDoneOutlined />}
-            onClick={() => onDetail(project.id)} // Handle project detail view
-            style={{ marginRight: '8px' }}
-          />
-          {/* Show assign button only for admin role */}
-          {role === 'admin' && (
+          {onAssign && (
             <Button
               type="default"
               icon={<TeamOutlined />}
-              onClick={() => onAssign(project.id)} // Pass the project ID to the onAssign function
+              onClick={() => onAssign(project.id)}
             />
           )}
         </div>
@@ -80,7 +75,7 @@ const ProjectList = ({ projects, onDetail, onEdit, onDelete, onAssign, role }) =
       dataSource={projects}
       columns={columns}
       rowKey="id"
-      pagination={false} // Disable internal pagination for now
+      pagination={false}
     />
   );
 };

@@ -1,45 +1,31 @@
-// src/components/Projects/UserAssignmentModal.jsx
+// src/components/Tasks/TaskAssignmentModal.jsx
 import React, { useEffect, useState } from 'react';
 import { Modal, Input, List, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '../../features/users/userSlice'; // Adjust import based on your file structure
+import { fetchUsers } from '../../features/users/userSlice'; // Adjust based on your file structure
 
-const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
+const TaskAssignmentModal = ({ visible, onClose, onSubmit, taskId }) => {
   const dispatch = useDispatch();
   const { users, loading, totalUsers } = useSelector((state) => state.users);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [userIds, setUserIds] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
 
-  // Fetch users based on search term and pagination
   useEffect(() => {
-    if (searchTerm) {
-      dispatch(fetchUsers({ search: searchTerm, page: currentPage, limit: 10 }));
+    if (visible) {
+      dispatch(fetchUsers({ page: 1, limit: 10 })); // Fetch users when the modal opens
     }
-  }, [dispatch, searchTerm, currentPage]);
+  }, [dispatch, visible]);
 
-  // Reset when modal is closed
   useEffect(() => {
     if (!visible) {
       setSearchTerm('');
       setUserIds([]);
-      setCurrentPage(1);
-      setHasMore(true);
     }
   }, [visible]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when search term changes
-  };
-
-  const handleScroll = (e) => {
-    const bottom = e.target.scrollHeight === e.target.scrollTop + e.target.clientHeight;
-    if (bottom && hasMore && !loading) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
   };
 
   const handleUserToggle = (userId) => {
@@ -49,13 +35,14 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit({ userIds });
+    onSubmit({ taskId, userIds });
+    onClose(); // Close the modal after submitting
   };
 
   return (
     <Modal
-      title="Assign Users to Project"
-      open={visible}
+      title="Assign Users to Task"
+      visible={visible} // Ensure this is 'visible'
       onOk={handleSubmit}
       onCancel={onClose}
       okText="Assign"
@@ -66,13 +53,10 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
         value={searchTerm}
         onChange={handleSearchChange}
       />
-      <div
-        style={{ height: '300px', overflowY: 'auto' }}
-        onScroll={handleScroll}
-      >
-        {loading && currentPage === 1 && <Spin />}
+      <div style={{ height: '300px', overflowY: 'auto' }}>
+        {loading && <Spin />}
         <List
-          dataSource={users}
+          dataSource={users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()))}
           renderItem={(user) => (
             <List.Item
               onClick={() => handleUserToggle(user.id)}
@@ -83,10 +67,9 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
           )}
         />
         {!loading && totalUsers === 0 && <p>No users found.</p>}
-        {loading && currentPage > 1 && <Spin />}
       </div>
     </Modal>
   );
 };
 
-export default UserAssignmentModal;
+export default TaskAssignmentModal;

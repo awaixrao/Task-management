@@ -1,71 +1,29 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Modal, Button, Input, Select, Form, DatePicker } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 const { Option } = Select;
 
+// Team members for assignment
 const teamMembers = ['John', 'Sarah', 'Mike', 'Alice', 'Bob'];
-const taskStates = ['To Do', 'In Progress', 'Completed'];
 
-const initialTasks = {
-  todo: [
-    { id: 'task-1', title: 'Design Wireframes', description: 'Create basic wireframes for the project.', assignees: ['John'], dueDate: '2023-10-30' },
-    { id: 'task-2', title: 'Setup Backend', description: 'Initialize the backend environment.', assignees: ['Sarah'], dueDate: '2023-11-02' },
-  ],
-  inProgress: [
-    { id: 'task-3', title: 'Develop Frontend', description: 'Create the frontend UI for the project.', assignees: ['Mike'], dueDate: '2023-11-05' },
-  ],
-  completed: [
-    { id: 'task-4', title: 'Client Meeting', description: 'Discuss project requirements with the client.', assignees: ['Alice', 'Bob'], dueDate: '2023-10-20' },
-  ],
-};
+// Allowed task statuses according to the schema
+const taskStates = ['todo', 'in-progress', 'testing', 'hold', 'completed'];
 
-const Tasks = () => {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [newTask, setNewTask] = useState({ title: '', description: '', assignees: [], dueDate: null });
+const Tasks = ({ tasks, onAddTask, onUpdateTasks }) => {
+  console.log("Tasks received in Tasks component:", tasks); // Log tasks for debugging
+
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    assignees: [],
+    dueDate: null,
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([]);
 
-  // Handle drag and drop event
-  const onDragEnd = (result) => {
-    const { source, destination } = result;
-
-    // Check if the item was dropped outside a droppable area
-    if (!destination) return;
-
-    const sourceCol = source.droppableId;
-    const destinationCol = destination.droppableId;
-
-    // If the item was dropped in the same column
-    if (sourceCol === destinationCol) {
-        const updatedTasks = Array.from(tasks[sourceCol]);
-        const [removed] = updatedTasks.splice(source.index, 1);
-        updatedTasks.splice(destination.index, 0, removed);
-        
-        setTasks((prev) => ({
-            ...prev,
-            [sourceCol]: updatedTasks,
-        }));
-    } else {
-        // Moving to a different column
-        const sourceTasks = Array.from(tasks[sourceCol]);
-        const destinationTasks = Array.from(tasks[destinationCol]);
-        
-        const [removed] = sourceTasks.splice(source.index, 1);
-        destinationTasks.splice(destination.index, 0, removed);
-        
-        setTasks((prev) => ({
-            ...prev,
-            [sourceCol]: sourceTasks,
-            [destinationCol]: destinationTasks,
-        }));
-    }
-};
-
-
-  // Open modal for new task
   const openModal = () => setIsModalOpen(true);
 
   const handleModalClose = () => {
@@ -74,69 +32,80 @@ const Tasks = () => {
     setSelectedMembers([]);
   };
 
-  // Add new task to "To Do"
   const handleAddTask = () => {
-    if (!newTask.title || !selectedMembers.length) return;
+    // Validate the task input
+    if (!newTask.title || !selectedMembers.length || !newTask.dueDate) {
+      console.error('Please fill in all fields');
+      return; // Early exit if validation fails
+    }
 
+    // Create new task object adhering to the schema
     const newTaskObj = {
-      id: `task-${Date.now()}`, // Ensure unique task ID
+      id: Date.now(), // Unique ID for the task, using current timestamp
       title: newTask.title,
       description: newTask.description,
       assignees: selectedMembers,
       dueDate: newTask.dueDate ? newTask.dueDate.toISOString().split('T')[0] : null,
+      status: 'todo', // Default status as per schema
     };
 
-    setTasks((prev) => ({
-      ...prev,
-      todo: [...prev.todo, newTaskObj], // Add new task to "To Do"
-    }));
-
+    onAddTask(newTaskObj);
     handleModalClose();
   };
 
   const handleDueDateChange = (date) => setNewTask((prev) => ({ ...prev, dueDate: date }));
 
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const updatedTasks = Array.from(tasks);
+    const [movedTask] = updatedTasks.splice(result.source.index, 1);
+    
+    // Update task status to the new droppableId (make sure to map droppableId to valid task states)
+    movedTask.status = result.destination.droppableId; // droppableId needs to match the schema values
+    updatedTasks.splice(result.destination.index, 0, movedTask);
+
+    onUpdateTasks(updatedTasks);
+  };
+
   return (
     <div className="p-6 rounded-md shadow-md bg-gray-100">
-      <h1 className="text-2xl font-semibold mb-6">Static Tasks</h1>
-
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {taskStates.map((state) => {
-            const key = state.toLowerCase().replace(/\s/g, '');
-
-            return (
-              <Droppable key={key} droppableId={key}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="bg-white p-4 rounded-md shadow-md"
-                  >
-                    <h2 className="text-lg font-semibold mb-4">{state}</h2>
-                    {tasks[key] && tasks[key].map((task, index) => (
-                      <Draggable key={task.id} draggableId={task.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="bg-white p-4 mb-4 rounded-md shadow-md"
-                          >
-                            <div className="mb-2 text-sm font-medium">{task.title}</div>
-                            <p className="text-gray-600">{task.description}</p>
-                            <p className="text-sm font-light">Assigned to: {task.assignees.join(', ')}</p>
-                            <p className="text-sm font-light">Due date: {moment(task.dueDate).format('LL')}</p>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            );
-          })}
+          {taskStates.map((state) => (
+            <Droppable key={state} droppableId={state}>
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="bg-white p-4 rounded-md shadow-md"
+                >
+                  <h2 className="text-lg font-semibold mb-4">{state.charAt(0).toUpperCase() + state.slice(1)}</h2>
+                  {/* Check if tasks is an array before filtering */}
+                  {(Array.isArray(tasks) ? tasks : []).filter((task) => task.status === state).map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="bg-white p-4 mb-4 rounded-md shadow-md"
+                        >
+                          <div className="mb-2 text-sm font-medium">{task.title}</div>
+                          <p className="text-gray-600">{task.description}</p>
+                          <p className="text-sm font-light">Assigned to: {task.assignees.join(', ')}</p>
+                          <p className="text-sm font-light">
+                            Due date: {task.dueDate ? moment(task.dueDate).format('LL') : 'No due date'}
+                          </p>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          ))}
         </div>
       </DragDropContext>
 
@@ -146,7 +115,6 @@ const Tasks = () => {
         </Button>
       </div>
 
-      {/* Modal for adding new tasks */}
       <Modal
         title="Add New Task"
         open={isModalOpen}
@@ -156,22 +124,22 @@ const Tasks = () => {
         cancelText="Cancel"
       >
         <Form layout="vertical">
-          <Form.Item label="Task Title">
+          <Form.Item label="Task Title" required>
             <Input
               value={newTask.title}
-              onChange={(e) => setNewTask((prev) => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => setNewTask((prev) => ({ ...prev, title: e.target.value }))} 
               placeholder="Enter task title"
             />
           </Form.Item>
           <Form.Item label="Task Description">
             <Input.TextArea
               value={newTask.description}
-              onChange={(e) => setNewTask((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setNewTask((prev) => ({ ...prev, description: e.target.value }))} 
               placeholder="Enter task description"
               rows={4}
             />
           </Form.Item>
-          <Form.Item label="Assign to">
+          <Form.Item label="Assign to" required>
             <Select
               mode="multiple"
               value={selectedMembers}
@@ -201,4 +169,16 @@ const Tasks = () => {
   );
 };
 
+Tasks.propTypes = {
+  tasks: PropTypes.array.isRequired,
+  onAddTask: PropTypes.func.isRequired,
+  onUpdateTasks: PropTypes.func.isRequired,
+};
+
+// Default prop values
+Tasks.defaultProps = {
+  tasks: [], // Ensure tasks defaults to an empty array
+};
+
 export default Tasks;
+``

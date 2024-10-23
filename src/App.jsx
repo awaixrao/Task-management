@@ -10,14 +10,17 @@ import SignupPage from './pages/Signup/SignupPage'; // Example login page
 import ProtectedRoute from './utils/ProtectedRoute '
 import UserManagementPage from './pages/userManagement/UserManagementPage';
 import ProfileUpdatePage from './pages/profile/ProfileUpdatePage';
-import TaskManagementBoard from './components/Kanban/TaskManagementBoard';
+import TasksPage from './pages/Tasks/TasksPage';
 
 const App = () => {
 
-  
   return (
+
+   
+    
     <Routes>
       {/* Public routes */}
+
       <Route path="login" element={<ProtectedRoute element={<LoginPage />} isPublic={true} />} />
       <Route path="signup" element={<ProtectedRoute element={<SignupPage />} isPublic={true} />} />
 
@@ -27,7 +30,7 @@ const App = () => {
         <Route path="projects" element={<ProtectedRoute element={<ProjectsPage />} />} />
         <Route path="users" element={<ProtectedRoute element={<UserManagementPage />} />} />
         <Route path="profile" element={<ProtectedRoute element={<ProfileUpdatePage />} />} />
-        <Route path="tasks" element={<ProtectedRoute element={<TaskManagementBoard />} />} />
+        <Route path="tasks/:id?" element={<ProtectedRoute element={<TasksPage />} />} />
 
 
       </Route>

@@ -16,7 +16,7 @@ const EditProjectModal = ({ visible, onClose, onSubmit, project }) => {
   return (
     <Modal
       title="Edit Project"
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       onOk={handleOk}
     >

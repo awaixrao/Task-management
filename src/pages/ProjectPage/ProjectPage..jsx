@@ -10,16 +10,17 @@ import {
   clearError,
   assignUsersToProject,
 } from '../../features/projects/projectSlice';
-import { fetchUserProjects } from '../../features/projects/userProjectSlice';
+import { fetchUserProjects } from '../../features/projects/userProjectSlice'; // Import the action for user projects
 
 import ProjectList from '../../components/Projects/ProjectList';
 import EditProjectModal from '../../components/Projects/EditProjectModal';
-import UserAssignmentModal from '../../components/Projects/AssignUserModal';
+import UserAssignmentModal from '../../components/Projects/AssignUserModal'; // New component for user assignment
 
 const ProjectsPage = () => {
   const dispatch = useDispatch();
-  const { role } = useSelector((state) => state.auth.user);
-  
+
+  // Fetching user role from auth state
+  const { role } = useSelector((state) => state.auth.user); // Assuming role is stored in auth state after login
   const {
     projects: adminProjects,
     totalProjects,
@@ -47,17 +48,15 @@ const ProjectsPage = () => {
     if (role === 'admin') {
       dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
     } else if (role === 'user') {
-      dispatch(fetchUserProjects());
+      dispatch(fetchUserProjects()); // Fetch only user-assigned projects
     }
   }, [dispatch, role, currentPage, pageSize]);
 
-  // Log the fetched projects for debugging
+  // Log the fetched projects for debugging purposes
   useEffect(() => {
-    console.log('Admin Projects:', adminProjects);
-    console.log('User Projects:', userProjects);
   }, [adminProjects, userProjects]);
 
-  // Handle errors
+  // Handle errors for admin and user separately
   useEffect(() => {
     if (adminError) {
       notification.error({
@@ -75,9 +74,9 @@ const ProjectsPage = () => {
     }
   }, [adminError, userError, dispatch]);
 
-  // Add Project
+  // Handle actions (add, edit, delete, assign) only for admin role
   const handleAddProject = async (newProject) => {
-    if (role !== 'admin') return;
+    if (role !== 'admin') return; // Restrict adding project for non-admin users
     try {
       await dispatch(createProject(newProject)).unwrap();
       notification.success({
@@ -91,9 +90,8 @@ const ProjectsPage = () => {
     }
   };
 
-  // Edit Project
   const handleEditProject = async (updatedProject) => {
-    if (!editingProject || role !== 'admin') return;
+    if (!editingProject || role !== 'admin') return; // Restrict editing for non-admin users
     try {
       await dispatch(updateProject({ id: editingProject.id, projectData: updatedProject })).unwrap();
       notification.success({
@@ -108,9 +106,8 @@ const ProjectsPage = () => {
     }
   };
 
-  // Delete Project
   const handleDeleteProject = (id) => {
-    if (role !== 'admin') return;
+    if (role !== 'admin') return; // Restrict deleting project for non-admin users
     Modal.confirm({
       title: 'Are you sure you want to delete this project?',
       onOk: () => {
@@ -125,9 +122,8 @@ const ProjectsPage = () => {
     });
   };
 
-  // Assign Users
   const handleAssignUsers = async () => {
-    if (role !== 'admin') return;
+    if (role !== 'admin') return; // Restrict assigning users for non-admin users
     try {
       await dispatch(assignUsersToProject({ projectId: selectedProjectId, userIds: userIdsToAssign })).unwrap();
       notification.success({
@@ -145,16 +141,14 @@ const ProjectsPage = () => {
     }
   };
 
-  // Handle Page Change
   const handlePageChange = (page) => {
     if (role === 'admin') {
       dispatch(fetchProjects({ page, limit: pageSize }));
     } else if (role === 'user') {
-      dispatch(fetchUserProjects({ page }));
+      dispatch(fetchUserProjects()); // Fetch user-specific projects
     }
   };
 
-  // Modal Handlers
   const openAddProjectModal = () => {
     if (role === 'admin') {
       setEditingProject(null);
@@ -194,6 +188,7 @@ const ProjectsPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">Projects Management</h1>
 
+      {/* Show "Add Project" button only if the role is admin */}
       {role === 'admin' && (
         <div className="flex justify-end mb-4">
           <Button
@@ -209,13 +204,13 @@ const ProjectsPage = () => {
         <p>Loading projects...</p>
       ) : (
         <>
-          {projectList.length > 0 ? (
+          {projectList && projectList.length > 0 ? (
             <>
               <ProjectList
                 projects={projectList}
-                onEdit={role === 'admin' ? openEditProjectModal : null}
-                onDelete={role === 'admin' ? handleDeleteProject : null}
-                onAssign={role === 'admin' ? openAssignUsersModal : null}
+                onEdit={role === 'admin' ? openEditProjectModal : null} // Allow edit only for admin
+                onDelete={role === 'admin' ? handleDeleteProject : null} // Allow delete only for admin
+                onAssign={role === 'admin' ? openAssignUsersModal : null} // Allow assign only for admin
               />
               <div className="flex justify-center mt-4">
                 <Pagination
@@ -230,6 +225,7 @@ const ProjectsPage = () => {
             <p>No projects found.</p>
           )}
 
+          {/* Modal for adding or editing project */}
           <EditProjectModal
             visible={modalOpen}
             onClose={closeModal}
@@ -238,6 +234,7 @@ const ProjectsPage = () => {
             errors={formErrors}
           />
 
+          {/* Modal for assigning users */}
           <UserAssignmentModal
             visible={assignModalOpen}
             onClose={closeAssignModal}

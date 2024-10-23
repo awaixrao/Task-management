@@ -14,7 +14,7 @@ export const fetchUserProjects = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming token is stored in localStorage
         },
       });
-      return response.data.data; // Assuming the data is under `data.data`
+      return response.data.data; // Return the array of projects directly
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: 'Failed to fetch assigned projects' }
@@ -45,7 +45,7 @@ const userProjectSlice = createSlice({
       })
       // Handle fulfilled state (success)
       .addCase(fetchUserProjects.fulfilled, (state, action) => {
-        state.projects = action.payload;
+        state.projects = action.payload.data; // Assign the payload directly to projects
         state.loading = false;
       })
       // Handle rejected state (error)
