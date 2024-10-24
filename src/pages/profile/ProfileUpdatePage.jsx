@@ -20,7 +20,7 @@ const ProfileUpdatePage = () => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
 
-  // Load user data into form when it is fetched
+  // Load user data 
   useEffect(() => {
     if (user) {
       setFormData({
@@ -40,7 +40,7 @@ const ProfileUpdatePage = () => {
     }));
   };
 
-  // Handle form submission
+  // Handle form 
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(updateUserProfile(formData)).then(() => {
@@ -51,7 +51,7 @@ const ProfileUpdatePage = () => {
     });
   };
 
-  // Show error notification if exists
+ 
   useEffect(() => {
     if (error) {
       notification.error({
@@ -62,7 +62,7 @@ const ProfileUpdatePage = () => {
   }, [error]);
 
   if (loading) {
-    return <Spin size="large" />; // Show a loading spinner while fetching the profile
+    return <Spin size="large" />; 
   }
 
   return (

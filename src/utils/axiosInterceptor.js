@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { logout } from '../features/auth/AuthSlice'; // Import the logout action
+import { logout } from '../features/auth/AuthSlice'; 
 
 const API_URL = 'https://task-manager.codionslab.com/api/v1';
 
-// Create an instance of Axios
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -17,27 +16,27 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Add token to headers
+      config.headers.Authorization = `Bearer ${token}`; 
     }
-    console.log("Interceptor Request:", config); // Optional: Log the config
+    console.log("Interceptor Request:", config); 
     return config;
   },
   (error) => {
-    console.log("Interceptor Request Error:", error); // Optional: Log the error
+    console.log("Interceptor Request Error:", error); 
     return Promise.reject(error);
   }
 );
 
-// Response Interceptor
+
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    console.log("Interceptor Response Error:", error); // Optional: Log the error
+    console.log("Interceptor Response Error:", error); 
     if (error.response && error.response.status === 401) {
-      store.dispatch(logout()); // Dispatch logout action
-      window.location.href = '/login'; // Redirect to login page
+      store.dispatch(logout()); 
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

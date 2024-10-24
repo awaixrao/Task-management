@@ -8,7 +8,7 @@ const LoginForm = ({ onFinish, loading }) => {
       <Form
         name="login"
         className="w-96"
-        onFinish={onFinish} // Call onFinish passed from the parent
+        onFinish={onFinish} 
       >
         <h2 className="text-center mb-6 text-xl font-semibold">Login</h2>
 

@@ -1,12 +1,11 @@
-// src/pages/Dashboard/DashboardPage.jsx
 import React from 'react';
 import { Card, Col, Row } from 'antd';
 import { Link } from 'react-router-dom';
 import { ProjectOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import { useSelector } from 'react-redux'; 
 
 const DashboardPage = () => {
-  const { role } = useSelector((state) => state.auth); // Get the role from Redux state
+  const { role } = useSelector((state) => state.auth);
 
   return (
     <div className="dashboard-page">
@@ -34,20 +33,7 @@ const DashboardPage = () => {
             </Link>
           </Col>
 
-          {/* Tasks Overview */}
-          <Col xs={24} sm={12} md={8}>
-            <Link to="/tasks">
-              <Card className="hover:shadow-lg transition-shadow duration-300" hoverable>
-                <div className="flex items-center p-4">
-                  <ContainerOutlined className="text-3xl mr-4" />
-                  <div>
-                    <h3 className="font-bold text-lg">Tasks</h3>
-                    <p>View and manage your tasks</p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          </Col>
+          
 
           {/* Users Overview (Admin Only) */}
           {role === 'admin' && (

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Input, List, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '../../features/users/userSlice'; // Adjust import based on your file structure
+import { fetchUsers } from '../../features/users/userSlice'; 
 
 const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
   const dispatch = useDispatch();
@@ -20,7 +20,6 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
     }
   }, [dispatch, searchTerm, currentPage]);
 
-  // Reset when modal is closed
   useEffect(() => {
     if (!visible) {
       setSearchTerm('');
@@ -32,7 +31,7 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when search term changes
+    setCurrentPage(1); 
   };
 
   const handleScroll = (e) => {

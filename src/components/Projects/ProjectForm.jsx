@@ -1,19 +1,19 @@
 import React from 'react';
 import { Form, Input, Button, message } from 'antd';
-import { useDispatch } from 'react-redux'; // Import useDispatch
-import { createProject } from '../../features/projects/projectSlice'; // Import your createProject action
+import { useDispatch } from 'react-redux'; 
+import { createProject } from '../../features/projects/projectSlice'; 
 
 const NewProjectForm = () => {
   const [form] = Form.useForm();
-  const dispatch = useDispatch(); // Initialize useDispatch
+  const dispatch = useDispatch(); 
 
   const onFinish = async (values) => {
     try {
-      await dispatch(createProject(values)).unwrap(); // Dispatch the createProject action
-      message.success('Project created successfully!'); // Show success message
-      form.resetFields(); // Reset form fields
+      await dispatch(createProject(values)).unwrap(); 
+      message.success('Project created successfully!'); 
+      form.resetFields(); 
     } catch (error) {
-      message.error('Failed to create project.'); // Show error message
+      message.error('Failed to create project.'); 
     }
   };
 

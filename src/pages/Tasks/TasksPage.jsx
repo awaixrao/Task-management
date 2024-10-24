@@ -1,4 +1,3 @@
-// src/pages/TasksPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -10,23 +9,26 @@ import {
   deleteTask,
   clearError,
   assignUsersToTask,
-} from '../../features/tasks/taskSlice'; // Adjust as necessary
-import { fetchUsers } from '../../features/users/userSlice'; // Import fetchUsers action
-import KanbanBoard from '../../components/Kanban/Kanban';
-import EditTaskModal from '../../components/Kanban/EditTaskModal';
-import TaskAssignmentModal from '../../components/Kanban/TaskAssignModal';
+} from '../../features/tasks/taskSlice'; 
+import { fetchUsers } from '../../features/users/userSlice'; 
+import KanbanBoard from '../../components/Tasks/Kanban';
+import EditTaskModal from '../../components/Tasks/EditTaskModal';
+import TaskAssignmentModal from '../../components/Tasks/TaskAssignModal';
 
 const TasksPage = () => {
   const dispatch = useDispatch();
   const { id: projectId } = useParams();
+  console.log(projectId);
+  
   const { tasks, loading: tasksLoading, error: tasksError } = useSelector((state) => state.tasks);
   const { users, loading: usersLoading, error: usersError } = useSelector((state) => state.users);
+  const { role: userRole } = useSelector((state) => state.auth); // Get user role from auth slice
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [formErrors, setFormErrors] = useState(null);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null); // Store selected task ID for assignment
+  const [selectedTaskId, setSelectedTaskId] = useState(null); 
 
   // Fetch tasks on component mount
   useEffect(() => {
@@ -35,7 +37,6 @@ const TasksPage = () => {
     }
   }, [dispatch, projectId]);
 
-  // Show error notifications for tasks
   useEffect(() => {
     if (tasksError) {
       notification.error({
@@ -46,7 +47,7 @@ const TasksPage = () => {
     }
   }, [tasksError, dispatch]);
 
-  // Handle task addition
+  // Handle task add
   const handleAddTask = async (newTask) => {
     try {
       await dispatch(createTask({ projectId, taskData: newTask })).unwrap();
@@ -105,7 +106,7 @@ const TasksPage = () => {
     const { destination, source } = result;
 
     if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
-      return; // No change in position
+      return; 
     }
 
     const movedTask = tasks.find((task) => task.id.toString() === source.draggableId);
@@ -136,13 +137,13 @@ const TasksPage = () => {
   // Handle user assignment to a task
   const handleAssignUser = async (data) => {
     try {
-      await dispatch(assignUsersToTask(data)).unwrap(); // data should include taskId and userIds
+      await dispatch(assignUsersToTask(data)).unwrap(); 
       notification.success({
         message: 'Success',
         description: 'User assigned to task successfully.',
       });
-      dispatch(fetchTasks(projectId)); // Refresh tasks after assignment
-      closeAssignModal(); // Close the assignment modal
+      dispatch(fetchTasks(projectId)); 
+      closeAssignModal(); 
     } catch (err) {
       notification.error({
         message: 'Error',
@@ -153,27 +154,29 @@ const TasksPage = () => {
 
   // Open user assignment modal with selected task ID
   const openAssignModal = (taskId) => {
-    setSelectedTaskId(taskId); // Set selected task ID for assignment
+    setSelectedTaskId(taskId); 
     setAssignModalVisible(true);
-    dispatch(fetchUsers({ page: 1, limit: 10 })); // Fetch users when opening the modal
+    dispatch(fetchUsers({ page: 1, limit: 10 })); 
   };
 
   // Close assignment modal
   const closeAssignModal = () => {
     setAssignModalVisible(false);
-    setSelectedTaskId(null); // Reset selected task ID
+    setSelectedTaskId(null); 
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">Task Management</h1>
       <div className="flex justify-end mb-4">
-        <Button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 text-lg rounded transition duration-300 ease-in-out"
-          onClick={openAddTaskModal}
-        >
-          Add Task
-        </Button>
+        {userRole === 'admin' && ( // Only show button for admin role
+          <Button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 text-lg rounded transition duration-300 ease-in-out"
+            onClick={openAddTaskModal}
+          >
+            Add Task
+          </Button>
+        )}
       </div>
       {(tasksLoading || usersLoading) ? (
         <p>Loading tasks...</p>
@@ -181,10 +184,13 @@ const TasksPage = () => {
         <>
           <KanbanBoard
             tasks={tasks}
-            onEdit={openEditTaskModal}
-            onDelete={handleDeleteTask}
+            onEdit={userRole === 'admin' ? openEditTaskModal : null} // Disable edit for non-admin
+            onDelete={userRole === 'admin' ? handleDeleteTask : null} // Disable delete for non-admin
             onDragEnd={onDragEnd}
-            onAssign={openAssignModal} // Pass task ID to openAssignModal
+            onAssign={openAssignModal} 
+            userRole={userRole} // Pass user role to KanbanBoard
+            projectId={projectId} // Ensure projectId is passed here
+
           />
           <EditTaskModal
             visible={modalOpen}
@@ -197,7 +203,7 @@ const TasksPage = () => {
             visible={assignModalVisible}
             onClose={closeAssignModal}
             onSubmit={handleAssignUser}
-            taskId={selectedTaskId} // Pass selected task ID to the modal
+            taskId={selectedTaskId} 
           />
         </>
       )}

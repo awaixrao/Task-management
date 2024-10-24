@@ -1,11 +1,10 @@
-// src/components/Projects/ProjectList.jsx
 import React from 'react';
 import { Table, Button, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, TeamOutlined, FileDoneOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const columns = [
     {
@@ -29,11 +28,10 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
       title: 'Actions',
       render: (_, project) => (
         <div>
-          {/* Always show the detail button and navigate to /tasks */}
           <Button
             type="default"
             icon={<FileDoneOutlined />}
-            onClick={() => navigate(`/tasks/${project.id}`)} // Navigate to /tasks/:id
+            onClick={() => navigate(`/tasks/${project.id}`)} 
             style={{ marginRight: '8px' }}
           />
           {onEdit && (

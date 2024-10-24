@@ -16,7 +16,7 @@ export const fetchTasks = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data; // Assuming the tasks are in response.data
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to fetch tasks' });
     }
@@ -35,7 +35,7 @@ export const createTask = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Assuming the new task is in response.data.data
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to create task' });
     }
@@ -52,7 +52,7 @@ export const fetchTaskById = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Assuming the task data is in response.data.data
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to fetch task' });
     }
@@ -71,7 +71,7 @@ export const updateTask = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Assuming the updated task is in response.data.data
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to update task' });
     }
@@ -83,7 +83,7 @@ export const deleteTask = createAsyncThunk(
   'tasks/deleteTask',
   async ({ projectId, taskId }, { rejectWithValue }) => {
     try {
-      console.log('Project ID:', projectId, 'Task ID:', taskId);  // Log the IDs before making the request
+      console.log('Project ID:', projectId, 'Task ID:', taskId);
       await axios.delete(`${API_URL}/${projectId}/task/${taskId}`, {
         headers: {
           Accept: 'application/json',
@@ -91,15 +91,13 @@ export const deleteTask = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return taskId; // Return the taskId to remove from the state
+      return taskId;
     } catch (error) {
-      console.error('Delete Task Error:', error.response); // Log the error response
+      console.error('Delete Task Error:', error.response);
       return rejectWithValue(error.response?.data || { message: 'Failed to delete task' });
     }
   }
 );
-
-
 
 // Async thunk for assigning users to a task
 export const assignUsersToTask = createAsyncThunk(
@@ -115,7 +113,7 @@ export const assignUsersToTask = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Assuming assigned users data is in response.data.data
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to assign users to task' });
     }
@@ -124,9 +122,9 @@ export const assignUsersToTask = createAsyncThunk(
 
 // Initial state
 const initialState = {
-  tasks: [],  // List of tasks
-  loading: false, // To handle loading state
-  error: null,    // To store error messages
+  tasks: [],
+  loading: false,
+  error: null,
 };
 
 // Task slice
@@ -135,7 +133,7 @@ const taskSlice = createSlice({
   initialState,
   reducers: {
     clearError: (state) => {
-      state.error = null; // Clear any existing error
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -147,7 +145,7 @@ const taskSlice = createSlice({
       })
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks = action.payload.data; // Assuming the fetched tasks are in action.payload.data
+        state.tasks = action.payload.data;
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.loading = false;
@@ -161,21 +159,20 @@ const taskSlice = createSlice({
       })
       .addCase(createTask.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks.push(action.payload); // Add the newly created task
+        state.tasks.push(action.payload);
       })
       .addCase(createTask.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Handle fetchTaskById (can be used to edit task or display detailed task view)
+      // Handle fetchTaskById
       .addCase(fetchTaskById.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchTaskById.fulfilled, (state, action) => {
         state.loading = false;
-        // You can update a specific task in the state here if needed
       })
       .addCase(fetchTaskById.rejected, (state, action) => {
         state.loading = false;
@@ -191,7 +188,7 @@ const taskSlice = createSlice({
         state.loading = false;
         state.tasks = state.tasks.map((task) =>
           task.id === action.payload.id ? action.payload : task
-        ); // Update the task in the state
+        );
       })
       .addCase(updateTask.rejected, (state, action) => {
         state.loading = false;
@@ -219,7 +216,6 @@ const taskSlice = createSlice({
       })
       .addCase(assignUsersToTask.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle assigning users to the task if needed
       })
       .addCase(assignUsersToTask.rejected, (state, action) => {
         state.loading = false;

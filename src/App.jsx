@@ -1,16 +1,17 @@
 // src/App.jsx
 import React from 'react';
 import {  Routes, Route } from 'react-router-dom';
-import MainOutlet from './MainOutlet'; // Main layout
-import DashboardPage from './pages/Home/HomePage'; // Dashboard content
-import ProjectsPage from './pages/ProjectPage/ProjectPage.'; // Another page
-import LoginPage from './pages/Login/LoginPage'; // Example login page
-import SignupPage from './pages/Signup/SignupPage'; // Example login page
+import MainOutlet from './MainOutlet'; 
+import DashboardPage from './pages/Home/HomePage'; 
+import ProjectsPage from './pages/ProjectPage/ProjectPage.'; 
+import LoginPage from './pages/Login/LoginPage';
+import SignupPage from './pages/Signup/SignupPage'; 
 
 import ProtectedRoute from './utils/ProtectedRoute '
 import UserManagementPage from './pages/userManagement/UserManagementPage';
 import ProfileUpdatePage from './pages/profile/ProfileUpdatePage';
 import TasksPage from './pages/Tasks/TasksPage';
+import CommentsPage from './pages/comments/CommentPage';
 
 const App = () => {
 
@@ -31,9 +32,8 @@ const App = () => {
         <Route path="users" element={<ProtectedRoute element={<UserManagementPage />} />} />
         <Route path="profile" element={<ProtectedRoute element={<ProfileUpdatePage />} />} />
         <Route path="tasks/:id?" element={<ProtectedRoute element={<TasksPage />} />} />
-
-
-      </Route>
+        <Route path="projects/:projectId/tasks/:taskId/comments" element={<ProtectedRoute element={<CommentsPage />} />} />
+        </Route>
     </Routes>
   );
 };

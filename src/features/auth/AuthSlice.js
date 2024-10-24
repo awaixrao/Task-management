@@ -2,7 +2,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Define API base URL in a separate constant
 const API_URL = 'https://task-manager.codionslab.com/api/v1';
 
 // Async thunk for user login
@@ -23,12 +22,10 @@ export const loginUser = createAsyncThunk(
         throw new Error('Token not found in response');
       }
 
-      // Store token and user role in localStorage for session persistence
       localStorage.setItem('token', token);
-      localStorage.setItem('userRole', user.role); // Store user role
-      localStorage.setItem('user', JSON.stringify(user)); // Store user data
+      localStorage.setItem('userRole', user.role);
+      localStorage.setItem('user', JSON.stringify(user));
 
-      // Return user, token, and role for updating Redux state
       return { user, token, role: user.role };
     } catch (error) {
       return rejectWithValue(
@@ -52,12 +49,11 @@ export const register = createAsyncThunk(
 
       const { token, user } = response.data.data;
 
-      // Store token and user data in localStorage for session persistence
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user)); // Store user data
-      localStorage.setItem('userRole', user.role); // Store user role
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('userRole', user.role);
 
-      return { user, token, role: user.role }; // Return user info and role
+      return { user, token, role: user.role };
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: 'Registration failed. Please try again.' }
@@ -68,9 +64,9 @@ export const register = createAsyncThunk(
 
 // Initial state
 const initialState = {
-  user: JSON.parse(localStorage.getItem('user')) || null, // Load user from localStorage
-  token: localStorage.getItem('token') || null, // Load token from localStorage
-  role: localStorage.getItem('userRole') || null, // Load role from localStorage
+  user: JSON.parse(localStorage.getItem('user')) || null,
+  token: localStorage.getItem('token') || null,
+  role: localStorage.getItem('userRole') || null,
   loading: false,
   error: null,
 };
@@ -83,60 +79,55 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.role = null;
-      // Clear user data from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('userRole');
     },
     clearError: (state) => {
-      state.error = null; // Clear error message
+      state.error = null;
     },
     setUserRole: (state, action) => {
-      state.role = action.payload; // Update role in the state
-      localStorage.setItem('userRole', action.payload); // Also update localStorage
+      state.role = action.payload;
+      localStorage.setItem('userRole', action.payload);
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
-        state.loading = true; // Set loading to true during API call
-        state.error = null; // Clear previous errors
+        state.loading = true;
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false; // Set loading to false after success
-        state.user = action.payload.user; // Update user in state
-        state.token = action.payload.token; // Update token in state
-        state.role = action.payload.role; // Update role in state
-        // Store user in localStorage
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.role = action.payload.role;
         localStorage.setItem('user', JSON.stringify(action.payload.user)); 
-        localStorage.setItem('userRole', action.payload.role); // Store role in localStorage
+        localStorage.setItem('userRole', action.payload.role);
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false; // Set loading to false on error
-        state.error = action.payload; // Set error message
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(register.pending, (state) => {
-        state.loading = true; // Set loading to true during API call
-        state.error = null; // Clear previous errors
+        state.loading = true;
+        state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.loading = false; // Set loading to false after success
-        state.user = action.payload.user; // Update user in state
-        state.token = action.payload.token; // Update token in state
-        state.role = action.payload.role; // Update role in state
-        // Store user in localStorage
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.role = action.payload.role;
         localStorage.setItem('user', JSON.stringify(action.payload.user)); 
-        localStorage.setItem('userRole', action.payload.role); // Store role in localStorage
+        localStorage.setItem('userRole', action.payload.role);
       })
       .addCase(register.rejected, (state, action) => {
-        state.loading = false; // Set loading to false on error
-        state.error = action.payload; // Set error message
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-// Export actions for use in components
 export const { logout, clearError, setUserRole } = authSlice.actions;
 
-// Export the reducer to be used in the store
 export default authSlice.reducer;

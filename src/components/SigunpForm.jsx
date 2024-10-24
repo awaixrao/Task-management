@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 
 const SignUpForm = ({ onSignUp, loading }) => {
   const onFinish = (values) => {
-    if (!loading) { // Prevent submitting if already loading
-      onSignUp(values); // Call the onSignUp function passed from SignupPage
+    if (!loading) { 
+      onSignUp(values); 
     }
   };
 

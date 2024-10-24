@@ -1,7 +1,7 @@
 // src/layouts/MainOutlet.jsx
 import React from 'react';
 import { Layout } from 'antd';
-import { Outlet } from 'react-router-dom'; // Use Outlet for nested route content
+import { Outlet } from 'react-router-dom'; 
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
 import Footer from './components/common/Footer';
@@ -16,7 +16,7 @@ const MainOutlet = () => {
       <Sidebar />
       <Layout style={{ padding: '0 24px 24px' }}>
         <Content style={{ padding: '24px', margin: 0, minHeight: 280 }}>
-          <Outlet /> {/* This will render the nested route content */}
+          <Outlet />
         </Content>
         <Footer />
       </Layout>

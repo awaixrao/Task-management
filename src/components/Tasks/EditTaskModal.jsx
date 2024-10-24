@@ -1,6 +1,5 @@
-// src/components/Kanban/EditTaskModal.jsx
-import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, DatePicker, Select } from 'antd';
+import React, { useEffect } from 'react';
+import { Button, Modal, Form, Input, DatePicker, Select } from 'antd';
 import moment from 'moment';
 
 const { Option } = Select;
@@ -13,19 +12,25 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
       form.setFieldsValue({
         name: task.name,
         description: task.description,
-        due_date: task.due_date ? moment(task.due_date) : null, // Ensure date is in the correct format
+        due_date: task.due_date ? moment(task.due_date, 'YYYY-MM-DD') : null,
         status: task.status,
       });
+    } else {
+      form.resetFields();
     }
   }, [task, form]);
 
   const handleFinish = (values) => {
-    onSubmit(values); // Submit the form values
+    const formattedValues = {
+      ...values,
+      due_date: values.due_date ? values.due_date.format('YYYY-MM-DD') : null,
+    };
+    onSubmit(formattedValues);
   };
 
   return (
     <Modal
-      title={task ? "Edit Task" : "Add Task"}
+      title={task ? 'Edit Task' : 'Add Task'}
       visible={visible}
       onCancel={onClose}
       footer={null}
@@ -34,7 +39,7 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
         form={form}
         layout="vertical"
         onFinish={handleFinish}
-        initialValues={{ status: 'todo' }} // Default value for status
+        initialValues={{ status: 'todo' }}
       >
         <Form.Item
           label="Task Name"
@@ -54,7 +59,10 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
           name="due_date"
           rules={[{ required: true, message: 'The due date field is required.' }]}
         >
-          <DatePicker style={{ width: '100%' }} />
+          <DatePicker
+            style={{ width: '100%' }}
+            format="YYYY-MM-DD"
+          />
         </Form.Item>
         <Form.Item
           label="Status"
@@ -69,11 +77,13 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
             <Option value="completed">Completed</Option>
           </Select>
         </Form.Item>
+
         <Form.Item>
-          <button type="submit" className="ant-btn ant-btn-primary">
+          <Button type="primary" htmlType="submit" className="custom-btn">
             {task ? 'Update Task' : 'Add Task'}
-          </button>
+          </Button>
         </Form.Item>
+
         {errors && (
           <div className="text-red-500">
             {Object.entries(errors).map(([key, value]) => (

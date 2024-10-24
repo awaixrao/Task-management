@@ -4,12 +4,12 @@ import axios from 'axios';
 
 const API_URL = 'https://task-manager.codionslab.com/api/v1/admin/user';
 
-// Async thunk for fetching users with pagination
+// Fetch users with pagination
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async ({ page = 1, limit = 10 }, { getState, rejectWithValue }) => {
     const state = getState();
-    const token = state.auth.token; // Retrieve token from auth state
+    const token = state.auth.token;
 
     if (!token) {
       return rejectWithValue({ message: 'No token provided' });
@@ -24,8 +24,8 @@ export const fetchUsers = createAsyncThunk(
         },
       });
       return {
-        users: response.data.data.data, // The actual user data
-        total: response.data.data.total, // Total number of users
+        users: response.data.data.data,
+        total: response.data.data.total,
         currentPage: page,
         pageSize: limit,
       };
@@ -35,12 +35,12 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for creating a user
+// Create a user
 export const createUser = createAsyncThunk(
   'users/createUser',
   async (userData, { getState, rejectWithValue }) => {
     const state = getState();
-    const token = state.auth.token; // Retrieve token from auth state
+    const token = state.auth.token;
 
     if (!token) {
       return rejectWithValue({ message: 'No token provided' });
@@ -54,19 +54,19 @@ export const createUser = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       });
-      return response.data.data; // Assuming the response structure
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to create user' });
     }
   }
 );
 
-// Async thunk for updating a user
+// Update a user
 export const updateUser = createAsyncThunk(
   'users/updateUser',
   async ({ id, userData }, { getState, rejectWithValue }) => {
     const state = getState();
-    const token = state.auth.token; // Retrieve token from auth state
+    const token = state.auth.token;
 
     if (!token) {
       return rejectWithValue({ message: 'No token provided' });
@@ -80,19 +80,19 @@ export const updateUser = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       });
-      return response.data.data; // Assuming the response structure
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to update user' });
     }
   }
 );
 
-// Async thunk for deleting a user
+// Delete a user
 export const deleteUser = createAsyncThunk(
   'users/deleteUser',
   async (id, { getState, rejectWithValue }) => {
     const state = getState();
-    const token = state.auth.token; // Retrieve token from auth state
+    const token = state.auth.token;
 
     if (!token) {
       return rejectWithValue({ message: 'No token provided' });
@@ -106,7 +106,7 @@ export const deleteUser = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       });
-      return id; // Return the id to remove it from the state
+      return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to delete user' });
     }
@@ -128,12 +128,11 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     clearError: (state) => {
-      state.error = null; // Clear error message
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Handle fetchUsers actions
       .addCase(fetchUsers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -149,44 +148,41 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Handle createUser actions
       .addCase(createUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users.push(action.payload); // Add new user to the state
+        state.users.push(action.payload);
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Set error message from payload
+        state.error = action.payload;
       })
-      // Handle updateUser actions
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = state.users.map(user => (user.id === action.payload.id ? action.payload : user)); // Update user in the state
+        state.users = state.users.map(user => (user.id === action.payload.id ? action.payload : user));
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Set error message from payload
+        state.error = action.payload;
       })
-      // Handle deleteUser actions
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = state.users.filter(user => user.id !== action.payload); // Remove user from the state
+        state.users = state.users.filter(user => user.id !== action.payload);
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Set error message from payload
+        state.error = action.payload;
       });
   },
 });

@@ -1,4 +1,3 @@
-// src/components/usermanagement/UserForm.jsx
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
 
@@ -7,15 +6,15 @@ const UserForm = ({ user, onSubmit, onCancel, errors }) => {
     name: '',
     email: '',
     password: '',
-    role: 'user', // Default role
-    is_active: true, // Default to active
+    role: 'user', 
+    is_active: true,
   });
 
   useEffect(() => {
     if (user) {
-      setFormData({ ...user }); // Set form data for editing
+      setFormData({ ...user }); 
     } else {
-      setFormData({ name: '', email: '', password: '', role: 'user', is_active: true }); // Reset form data for adding
+      setFormData({ name: '', email: '', password: '', role: 'user', is_active: true }); 
     }
   }, [user]);
 
@@ -28,7 +27,7 @@ const UserForm = ({ user, onSubmit, onCancel, errors }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit(formData); // Pass the form data back to the parent
+    onSubmit(formData); 
   };
 
   return (

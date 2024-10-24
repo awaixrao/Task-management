@@ -9,63 +9,61 @@ import { fetchUsers, createUser, updateUser, deleteUser } from '../../features/u
 const UserManagementPage = () => {
   const dispatch = useDispatch();
 
-  // Get the users state from the Redux store
   const { users, totalUsers, currentPage, pageSize, loading, error } = useSelector((state) => state.users);
 
-  // Local state for managing modal visibility and form data
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [formErrors, setFormErrors] = useState(null); // For storing form validation errors
+  const [formErrors, setFormErrors] = useState(null); 
 
-  // Fetch users whenever the page or page size changes
+  // Fetch users 
   useEffect(() => {
     dispatch(fetchUsers({ page: currentPage, limit: pageSize }));
   }, [dispatch, currentPage, pageSize]);
 
-  // Handle errors globally and notify the user
+  // Handle errors 
   useEffect(() => {
     if (error) {
       notification.error({
         message: 'Error',
-        description: error, // Display the error message from the state
+        description: error, 
       });
-      setFormErrors(null); // Clear form-specific errors when there is a global error
+      setFormErrors(null); 
     }
   }, [error]);
 
   // Handle adding a new user
   const handleAddUser = async (newUser) => {
     try {
-      await dispatch(createUser(newUser)).unwrap(); // Unwrap the promise to catch potential errors
+      await dispatch(createUser(newUser)).unwrap(); 
       notification.success({
         message: 'Success',
         description: 'User added successfully.',
       });
-      setModalOpen(false); // Close the modal after success
-      dispatch(fetchUsers({ page: currentPage, limit: pageSize })); // Refresh user list
+      setModalOpen(false); 
+      dispatch(fetchUsers({ page: currentPage, limit: pageSize })); 
     } catch (err) {
-      setFormErrors(err.errors); // Set form errors if there are validation issues
+      setFormErrors(err.errors); 
     }
   };
 
-  // Handle editing an existing user
+  // Handle editing user
   const handleEditUser = async (updatedUser) => {
-    if (!editingUser) return; // Make sure there's a user being edited
+    if (!editingUser) return; 
     try {
       await dispatch(updateUser({ id: editingUser.id, userData: updatedUser })).unwrap();
       notification.success({
         message: 'Success',
         description: 'User updated successfully.',
       });
-      setModalOpen(false); // Close the modal after success
-      setEditingUser(null); // Clear the editing state
-      dispatch(fetchUsers({ page: currentPage, limit: pageSize })); // Refresh user list
+      setModalOpen(false); 
+      setEditingUser(null); 
+      dispatch(fetchUsers({ page: currentPage, limit: pageSize })); 
     } catch (err) {
-      setFormErrors(err.errors); // Set form errors if there are validation issues
+      setFormErrors(err.errors); 
     }
   };
 
-  // Handle deleting a user with confirmation
+  // Handle deleting a user
   const handleDeleteUser = (id) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this user?',
@@ -75,7 +73,7 @@ const UserManagementPage = () => {
             message: 'Success',
             description: 'User deleted successfully.',
           });
-          dispatch(fetchUsers({ page: currentPage, limit: pageSize })); // Refresh user list
+          dispatch(fetchUsers({ page: currentPage, limit: pageSize })); 
         });
       },
     });
@@ -86,23 +84,23 @@ const UserManagementPage = () => {
     dispatch(fetchUsers({ page, limit: pageSize }));
   };
 
-  // Open the modal for adding a new user
+  //adding a new user
   const openAddUserModal = () => {
-    setEditingUser(null); // Ensure there's no user being edited
-    setModalOpen(true); // Open the modal
+    setEditingUser(null); 
+    setModalOpen(true);
   };
 
-  // Open the modal for editing a selected user
+  // edirting user
   const openEditUserModal = (user) => {
-    setEditingUser(user); // Set the selected user for editing
-    setModalOpen(true); // Open the modal
+    setEditingUser(user); 
+    setModalOpen(true); 
   };
 
   // Close the modal
   const closeModal = () => {
-    setModalOpen(false); // Close the modal
-    setEditingUser(null); // Reset the editing state
-    setFormErrors(null); // Clear form errors
+    setModalOpen(false); 
+    setEditingUser(null); 
+    setFormErrors(null); 
   };
 
   return (
@@ -119,7 +117,6 @@ const UserManagementPage = () => {
         </Button>
       </div>
 
-      {/* Display loading indicator */}
       {loading ? (
         <p>Loading users...</p>
       ) : (
@@ -128,9 +125,9 @@ const UserManagementPage = () => {
           {users.length > 0 ? (
             <>
               <UserList
-                users={users} // Pass the user list
-                onEdit={openEditUserModal} // Open the edit modal
-                onDelete={handleDeleteUser} // Handle user deletion
+                users={users} 
+                onEdit={openEditUserModal} 
+                onDelete={handleDeleteUser} 
               />
               {/* Pagination controls */}
               <div className="flex justify-center mt-4">
@@ -138,7 +135,7 @@ const UserManagementPage = () => {
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalUsers}
-                  onChange={handlePageChange} // Handle pagination change
+                  onChange={handlePageChange}
                 />
               </div>
             </>
@@ -146,18 +143,18 @@ const UserManagementPage = () => {
             <p>No users found.</p>
           )}
 
-          {/* Modal for adding/editing a user */}
+          {/* Modal for adding editing a user */}
           <Modal
             title={editingUser ? 'Edit User' : 'Add User'}
             open={modalOpen}
-            footer={null} // We'll handle the modal actions in the form
+            footer={null} 
             onCancel={closeModal}
           >
             <UserForm
-              user={editingUser} // Pass the selected user for editing
-              onSubmit={editingUser ? handleEditUser : handleAddUser} // Handle form submission
-              onCancel={closeModal} // Close modal on cancel
-              errors={formErrors} // Pass form errors to the form
+              user={editingUser} 
+              onSubmit={editingUser ? handleEditUser : handleAddUser} 
+              onCancel={closeModal} 
+              errors={formErrors} 
             />
           </Modal>
         </>

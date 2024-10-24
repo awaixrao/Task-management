@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login'); // Redirect to the login page or home page after logout
+    navigate('/login'); 
   };
 
   const menuItems = [

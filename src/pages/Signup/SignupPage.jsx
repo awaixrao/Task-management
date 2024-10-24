@@ -23,7 +23,7 @@ const SignupPage = () => {
     }
     if (user) {
       message.success('Signup successful! Redirecting to login...');
-      navigate('/login'); // Redirect to login after successful signup
+      navigate('/login'); 
     }
   }, [error, user, navigate]);
 

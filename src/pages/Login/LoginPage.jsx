@@ -1,4 +1,3 @@
-// src/pages/LoginPage.js
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,14 +10,13 @@ import { message } from 'antd';
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation(); // Get the location object
+  const location = useLocation();
   const { loading, error } = useSelector((state) => state.auth);
 
   const handleLogin = async (userData) => {
     const resultAction = await dispatch(loginUser(userData));
     if (loginUser.fulfilled.match(resultAction)) {
-      // If login is successful, navigate to the originally intended page
-      const redirectPath = location.state?.from || '/dashboard'; // Use the original location or default to dashboard
+      const redirectPath = location.state?.from || '/dashboard'; 
       navigate(redirectPath);
     }
   };

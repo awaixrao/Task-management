@@ -8,7 +8,7 @@ const EditProjectModal = ({ visible, onClose, onSubmit, project }) => {
     form.validateFields().then(values => {
       onSubmit({
         ...values,
-        is_active: values.is_active === true, // Ensure is_active is boolean
+        is_active: values.is_active === true, 
       });
     });
   };
@@ -25,7 +25,7 @@ const EditProjectModal = ({ visible, onClose, onSubmit, project }) => {
         initialValues={{ 
           name: project?.name,
           description: project?.description,
-          is_active: project?.is_active, // Ensure this is a boolean
+          is_active: project?.is_active, 
         }}
       >
         <Form.Item

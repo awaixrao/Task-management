@@ -4,10 +4,10 @@ import axios from 'axios';
 
 const API_URL = 'https://task-manager.codionslab.com/api/v1/profile';
 
-// Async thunk for fetching user profile
+// Fetch user profile
 export const fetchUserProfile = createAsyncThunk('profile/fetchUserProfile', async (_, { getState, rejectWithValue }) => {
   const state = getState();
-  const token = state.auth.token; // Retrieve token from auth state
+  const token = state.auth.token;
 
   if (!token) {
     return rejectWithValue({ message: 'No token provided' });
@@ -21,16 +21,16 @@ export const fetchUserProfile = createAsyncThunk('profile/fetchUserProfile', asy
         'Content-Type': 'application/json',
       },
     });
-    return response.data.data; // Assuming the response structure
+    return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data || { message: 'Failed to fetch profile' });
   }
 });
 
-// Async thunk for updating user profile
+// Update user profile
 export const updateUserProfile = createAsyncThunk('profile/updateUserProfile', async (userData, { getState, rejectWithValue }) => {
   const state = getState();
-  const token = state.auth.token; // Retrieve token from auth state
+  const token = state.auth.token;
 
   if (!token) {
     return rejectWithValue({ message: 'No token provided' });
@@ -44,13 +44,12 @@ export const updateUserProfile = createAsyncThunk('profile/updateUserProfile', a
         'Content-Type': 'application/json',
       },
     });
-    return response.data.data; // Assuming the response structure
+    return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data || { message: 'Failed to update profile' });
   }
 });
 
-// Initial state
 const initialState = {
   user: null,
   loading: false,
@@ -85,17 +84,15 @@ const profileSlice = createSlice({
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload; // Update user profile in the state
+        state.user = action.payload;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Set error message from payload
+        state.error = action.payload;
       });
   },
 });
 
-// Export actions
 export const { clearError } = profileSlice.actions;
 
-// Export reducer
 export default profileSlice.reducer;

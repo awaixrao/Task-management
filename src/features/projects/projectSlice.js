@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const API_URL = 'https://task-manager.codionslab.com/api/v1/admin/project';
 
-// Async thunk for fetching projects with pagination
+// Fetch projects with pagination
 export const fetchProjects = createAsyncThunk(
   'projects/fetchProjects',
   async ({ page = 1, limit = 10, userId }, { rejectWithValue }) => {
@@ -48,7 +48,7 @@ export const fetchUserProjects = createAsyncThunk(
   }
 );
 
-// Async thunk for creating a new project
+// Create a new project
 export const createProject = createAsyncThunk(
   'projects/createProject',
   async (projectData, { rejectWithValue }) => {
@@ -60,18 +60,17 @@ export const createProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Ensure this matches the expected structure
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to create project' });
     }
   }
 );
 
-// Async thunk for updating an existing project
+// Update an existing project
 export const updateProject = createAsyncThunk(
   'projects/updateProject',
   async ({ id, projectData }, { rejectWithValue }) => {
-    // Validate required fields
     const { name, description, is_active } = projectData;
     if (!name) return rejectWithValue({ message: 'The name field is required.' });
     if (!description) return rejectWithValue({ message: 'The description field is required.' });
@@ -85,14 +84,14 @@ export const updateProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Ensure this matches the expected structure
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to update project' });
     }
   }
 );
 
-// Async thunk for deleting a project
+// Delete a project
 export const deleteProject = createAsyncThunk(
   'projects/deleteProject',
   async (id, { rejectWithValue }) => {
@@ -104,14 +103,14 @@ export const deleteProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return id; // Return the id of the deleted project for filtering
+      return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to delete project' });
     }
   }
 );
 
-// Async thunk for assigning users to a project
+// Assign users to a project
 export const assignUsersToProject = createAsyncThunk(
   'projects/assignUsers',
   async ({ projectId, userIds }, { rejectWithValue }) => {
@@ -125,7 +124,7 @@ export const assignUsersToProject = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.data.data; // Ensure this matches the expected structure
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: 'Failed to assign users to project.' }
@@ -149,12 +148,11 @@ const projectSlice = createSlice({
   initialState,
   reducers: {
     clearError: (state) => {
-      state.error = null; // Clear error when called
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Handle fetchProjects actions
       .addCase(fetchProjects.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -170,20 +168,18 @@ const projectSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Handle createProject actions
       .addCase(createProject.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects.push(action.payload); // Add new project to the state
+        state.projects.push(action.payload);
       })
       .addCase(createProject.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Handle updateProject actions
       .addCase(updateProject.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -198,7 +194,6 @@ const projectSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Handle deleteProject actions
       .addCase(deleteProject.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -211,14 +206,12 @@ const projectSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Handle assignUsers actions
       .addCase(assignUsersToProject.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(assignUsersToProject.fulfilled, (state, action) => {
         state.loading = false;
-        // Optionally, you can update state here based on your API response
         console.log('Users assigned:', action.payload);
       })
       .addCase(assignUsersToProject.rejected, (state, action) => {
@@ -228,7 +221,6 @@ const projectSlice = createSlice({
   },
 });
 
-// Export the action to clear errors
 export const { clearError } = projectSlice.actions;
 
 // Export the reducer
