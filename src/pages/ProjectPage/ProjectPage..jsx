@@ -118,29 +118,30 @@ const ProjectsPage = () => {
     });
   };
 
-  const handleAssignUsers = async () => {
+  const handleAssignUsers = async (userIds) => {  // Add userIds parameter
     if (role !== "admin") return;
     try {
-      await dispatch(
-        assignUsersToProject({
-          projectId: selectedProjectId,
-          userIds: userIdsToAssign,
-        })
-      ).unwrap();
-      notification.success({
-        message: "Success",
-        description: "Users assigned successfully.",
-      });
-      setAssignModalOpen(false);
-      setUserIdsToAssign([]);
-      dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
+        await dispatch(
+            assignUsersToProject({
+                projectId: selectedProjectId,
+                userIds,
+            })
+        ).unwrap();
+        notification.success({
+            message: "Success",
+            description: "Users assigned successfully.",
+        });
+        setAssignModalOpen(false);
+        setUserIdsToAssign([]);
+        dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
     } catch (err) {
-      notification.error({
-        message: "Error",
-        description: err.message || "Failed to assign users.",
-      });
+        notification.error({
+            message: "Error",
+            description: err.message || "Failed to assign users.",
+        });
     }
-  };
+};
+
 
   const handlePageChange = (page) => {
     if (role === "admin") {

@@ -48,7 +48,8 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit({ userIds });
+    onSubmit( userIds );
+    
   };
 
   return (
