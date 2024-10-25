@@ -13,7 +13,7 @@ const columnStyles = {
 };
 
 const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) => {
-  console.log(projectId);
+  
   
   // State to manage modal visibility and selected task
   const [isModalVisible, setModalVisible] = useState(false);

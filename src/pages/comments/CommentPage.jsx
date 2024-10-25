@@ -113,7 +113,7 @@ const CommentsPage = () => {
       {/* Modal for Editing Comment */}
       <Modal
         title="Edit Comment"
-        visible={isModalOpen}
+        open = {isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={handleEditComment}
       >

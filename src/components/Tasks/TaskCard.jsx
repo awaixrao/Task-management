@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, CommentOutlined } from '@ant-design/icons';
 
 const TaskCard = ({ task, index, onEdit, onDelete, projectId, userRole }) => {
-  console.log("TaskCard projectId:", projectId); // Debugging line to check the projectId
 
   return (
     <Draggable draggableId={task.id.toString()} index={index}>

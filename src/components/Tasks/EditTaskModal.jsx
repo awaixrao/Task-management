@@ -16,7 +16,7 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
         status: task.status,
       });
     } else {
-      form.resetFields();
+
     }
   }, [task, form]);
 
@@ -31,7 +31,7 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
   return (
     <Modal
       title={task ? 'Edit Task' : 'Add Task'}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={null}
     >

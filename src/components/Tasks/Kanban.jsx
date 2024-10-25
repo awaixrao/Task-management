@@ -2,7 +2,7 @@ import React from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import TaskColumn from './TaskColumn';
 
-const KanbanBoard = ({ tasks, onEdit, onDelete, onDragEnd, projectId, userRole }) => {  console.log(projectId);
+const KanbanBoard = ({ tasks, onEdit, onDelete, onDragEnd, projectId, userRole }) => { 
 // Added userRole here
   const taskStatuses = ['todo', 'in-progress', 'testing', 'hold', 'completed'];
 

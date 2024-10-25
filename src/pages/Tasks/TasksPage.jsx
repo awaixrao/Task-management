@@ -18,7 +18,6 @@ import TaskAssignmentModal from '../../components/Tasks/TaskAssignModal';
 const TasksPage = () => {
   const dispatch = useDispatch();
   const { id: projectId } = useParams();
-  console.log(projectId);
   
   const { tasks, loading: tasksLoading, error: tasksError } = useSelector((state) => state.tasks);
   const { users, loading: usersLoading, error: usersError } = useSelector((state) => state.users);

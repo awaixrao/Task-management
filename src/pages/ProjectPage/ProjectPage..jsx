@@ -229,7 +229,7 @@ const ProjectsPage = () => {
 
           {/* Modal for adding or editing project */}
           <EditProjectModal
-            visible={modalOpen}
+            open={modalOpen}
             onClose={closeModal}
             onSubmit={editingProject ? handleEditProject : handleAddProject}
             project={editingProject}
@@ -238,7 +238,7 @@ const ProjectsPage = () => {
 
           {/* Modal for assigning users */}
           <UserAssignmentModal
-            visible={assignModalOpen}
+            open={assignModalOpen}
             onClose={closeAssignModal}
             onSubmit={handleAssignUsers}
           />
