@@ -3,15 +3,17 @@ import { Form, Input, Button, message } from 'antd';
 import { useDispatch } from 'react-redux'; 
 import { createProject } from '../../features/projects/projectSlice'; 
 
-const NewProjectForm = () => {
+const NewProjectForm = ({ onSuccess }) => { // Accept onSuccess as a prop
   const [form] = Form.useForm();
   const dispatch = useDispatch(); 
 
   const onFinish = async (values) => {
     try {
       await dispatch(createProject(values)).unwrap(); 
-      message.success('Project created successfully!'); 
       form.resetFields(); 
+      if (onSuccess) { // Call onSuccess if provided
+        onSuccess(); 
+      }
     } catch (error) {
       message.error('Failed to create project.'); 
     }

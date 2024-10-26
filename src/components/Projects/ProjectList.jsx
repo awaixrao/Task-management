@@ -64,7 +64,7 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
             <Button
               type="default"
               icon={<TeamOutlined />}
-              onClick={() => onAssign(project.id)}
+              onClick={() => onAssign(project.id)} // Trigger onAssign when clicked
               style={{ padding: isMobile ? '4px 6px' : '6px 12px' }}
             />
           )}

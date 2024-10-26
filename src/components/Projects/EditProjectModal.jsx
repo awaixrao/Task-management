@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form, Input, Switch } from 'antd';
 
 const EditProjectModal = ({ visible, onClose, onSubmit, project }) => {
   const [form] = Form.useForm();
 
+  // Use useEffect to update form values when project prop changes
+  useEffect(() => {
+    if (project)
+       {
+      form.setFieldsValue({
+        name: project.name,
+        description: project.description,
+        is_active: project.is_active,
+      });
+    }
+    
+  }, [project, form]); // Only run this effect when project or form changes
+
   const handleOk = () => {
     form.validateFields().then(values => {
       onSubmit({
         ...values,
-        is_active: values.is_active === true, 
+        is_active: values.is_active === true, // Ensure is_active is a boolean
       });
     });
   };
@@ -22,10 +35,11 @@ const EditProjectModal = ({ visible, onClose, onSubmit, project }) => {
     >
       <Form
         form={form}
+        // We can keep initialValues empty; it will be set on useEffect
         initialValues={{ 
-          name: project?.name,
-          description: project?.description,
-          is_active: project?.is_active, 
+          name: '', // Empty initially
+          description: '',
+          is_active: false, 
         }}
       >
         <Form.Item

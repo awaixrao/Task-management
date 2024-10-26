@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { Button, Modal, notification, Pagination, Alert } from "antd";
 import {
   fetchProjects,
-  createProject,
   updateProject,
   deleteProject,
   clearError,
@@ -13,10 +12,10 @@ import { fetchUserProjects } from "../../features/projects/userProjectSlice";
 import ProjectList from "../../components/Projects/ProjectList";
 import EditProjectModal from "../../components/Projects/EditProjectModal";
 import UserAssignmentModal from "../../components/Projects/AssignUserModal";
+import NewProjectForm from "../../components/Projects/ProjectForm";
 
 const ProjectsPage = () => {
   const dispatch = useDispatch();
-
   const { role } = useSelector((state) => state.auth.user);
   const {
     projects: adminProjects,
@@ -38,6 +37,7 @@ const ProjectsPage = () => {
   const [formErrors, setFormErrors] = useState(null);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [userIdsToAssign, setUserIdsToAssign] = useState([]);
 
   useEffect(() => {
     if (role === "admin") {
@@ -64,18 +64,11 @@ const ProjectsPage = () => {
     }
   }, [adminError, userError, dispatch]);
 
-  const handleAddProject = async (newProject) => {
-    if (role !== "admin") return;
-    try {
-      await dispatch(createProject(newProject)).unwrap();
-      notification.success({
-        message: "Success",
-        description: "Project added successfully.",
-      });
-      setModalOpen(false);
+  const refetchProjects = () => {
+    if (role === "admin") {
       dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
-    } catch (err) {
-      setFormErrors(err.errors);
+    } else if (role === "user") {
+      dispatch(fetchUserProjects());
     }
   };
 
@@ -91,7 +84,7 @@ const ProjectsPage = () => {
       });
       setModalOpen(false);
       setEditingProject(null);
-      dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
+      refetchProjects();
     } catch (err) {
       setFormErrors(err.errors);
     }
@@ -99,17 +92,18 @@ const ProjectsPage = () => {
 
   const handleDeleteProject = (id) => {
     if (role !== "admin") return;
-    Modal.confirm({
-      title: "Are you sure you want to delete this project?",
-      onOk: () => {
-        dispatch(deleteProject(id)).then(() => {
-          notification.success({
-            message: "Success",
-            description: "Project deleted successfully.",
-          });
-          dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
-        });
-      },
+
+    dispatch(deleteProject(id)).then(() => {
+      notification.success({
+        message: "Success",
+        description: "Project deleted successfully.",
+      });
+      refetchProjects();
+    }).catch((err) => {
+      notification.error({
+        message: "Error",
+        description: err.message || "Failed to delete project.",
+      });
     });
   };
 
@@ -127,7 +121,8 @@ const ProjectsPage = () => {
         description: "Users assigned successfully.",
       });
       setAssignModalOpen(false);
-      dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
+      setUserIdsToAssign([]);
+      refetchProjects();
     } catch (err) {
       notification.error({
         message: "Error",
@@ -158,7 +153,7 @@ const ProjectsPage = () => {
     }
   };
 
-  const openAssignUsersModal = (projectId) => {
+  const openAssignUsersModal = (projectId) => { 
     if (role === "admin") {
       setSelectedProjectId(projectId);
       setAssignModalOpen(true);
@@ -173,6 +168,7 @@ const ProjectsPage = () => {
   const closeAssignModal = () => {
     setAssignModalOpen(false);
     setSelectedProjectId(null);
+    setUserIdsToAssign([]);
   };
 
   const isLoading = role === "admin" ? adminLoading : userLoading;
@@ -205,19 +201,12 @@ const ProjectsPage = () => {
                 onDelete={role === "admin" ? handleDeleteProject : null}
                 onAssign={role === "admin" ? openAssignUsersModal : null}
               />
-              <div className="flex justify-center mt-4 px-2 md:px-0">
+              <div className="flex justify-center mt-4">
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalProjects}
                   onChange={handlePageChange}
-                  className="pagination-responsive"
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                    justifyContent: "center",
-                  }}
                 />
               </div>
             </>
@@ -225,16 +214,34 @@ const ProjectsPage = () => {
             <p>No projects found.</p>
           )}
 
+          <Modal
+            title="Add New Project"
+            visible={modalOpen && editingProject === null}
+            onCancel={closeModal}
+            footer={null}
+          >
+            <NewProjectForm
+              onSuccess={() => {
+                notification.success({
+                  message: "Success",
+                  description: "Project created successfully.",
+                });
+                setModalOpen(false);
+                refetchProjects();
+              }}
+            />
+          </Modal>
+
           <EditProjectModal
-            open={modalOpen}
+            visible={modalOpen && !!editingProject}
             onClose={closeModal}
-            onSubmit={editingProject ? handleEditProject : handleAddProject}
+            onSubmit={handleEditProject}
             project={editingProject}
             errors={formErrors}
           />
 
           <UserAssignmentModal
-            open={assignModalOpen}
+            visible={assignModalOpen}
             onClose={closeAssignModal}
             onSubmit={handleAssignUsers}
           />

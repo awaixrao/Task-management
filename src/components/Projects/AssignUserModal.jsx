@@ -1,8 +1,7 @@
-// src/components/Projects/UserAssignmentModal.jsx
 import React, { useEffect, useState } from 'react';
 import { Modal, Input, List, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '../../features/users/userSlice'; 
+import { fetchUsers } from '../../features/users/userSlice';
 
 const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
   const dispatch = useDispatch();
@@ -20,18 +19,23 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
     }
   }, [dispatch, searchTerm, currentPage]);
 
+  // Reset state when modal visibility changes
   useEffect(() => {
     if (!visible) {
-      setSearchTerm('');
-      setUserIds([]);
-      setCurrentPage(1);
-      setHasMore(true);
+      resetState();
     }
   }, [visible]);
 
+  const resetState = () => {
+    setSearchTerm('');
+    setUserIds([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  };
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); 
+    setCurrentPage(1); // Reset to first page on new search
   };
 
   const handleScroll = (e) => {
@@ -42,14 +46,14 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
   };
 
   const handleUserToggle = (userId) => {
-    setUserIds((prev) => 
+    setUserIds((prev) =>
       prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
     );
   };
 
   const handleSubmit = () => {
-    onSubmit( userIds );
-    
+    onSubmit(userIds);
+    resetState(); // Reset state after submission
   };
 
   return (
@@ -60,6 +64,7 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
       onCancel={onClose}
       okText="Assign"
       cancelText="Cancel"
+      destroyOnClose // This will destroy the modal component when closed
     >
       <Input
         placeholder="Search users..."
