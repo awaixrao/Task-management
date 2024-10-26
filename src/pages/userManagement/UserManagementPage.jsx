@@ -1,4 +1,3 @@
-// src/pages/UserManagementPage.jsx
 import React, { useEffect, useState } from 'react';
 import UserList from '../../components/usermanagement/UserList';
 import UserForm from '../../components/usermanagement/UserForm';
@@ -15,12 +14,10 @@ const UserManagementPage = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [formErrors, setFormErrors] = useState(null); 
 
-  // Fetch users 
   useEffect(() => {
     dispatch(fetchUsers({ page: currentPage, limit: pageSize }));
   }, [dispatch, currentPage, pageSize]);
 
-  // Handle errors 
   useEffect(() => {
     if (error) {
       notification.error({
@@ -31,7 +28,6 @@ const UserManagementPage = () => {
     }
   }, [error]);
 
-  // Handle adding a new user
   const handleAddUser = async (newUser) => {
     try {
       await dispatch(createUser(newUser)).unwrap(); 
@@ -46,7 +42,6 @@ const UserManagementPage = () => {
     }
   };
 
-  // Handle editing user
   const handleEditUser = async (updatedUser) => {
     if (!editingUser) return; 
     try {
@@ -63,7 +58,6 @@ const UserManagementPage = () => {
     }
   };
 
-  // Handle deleting a user
   const handleDeleteUser = (id) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this user?',
@@ -79,24 +73,20 @@ const UserManagementPage = () => {
     });
   };
 
-  // Handle page change for pagination
   const handlePageChange = (page) => {
     dispatch(fetchUsers({ page, limit: pageSize }));
   };
 
-  //adding a new user
   const openAddUserModal = () => {
     setEditingUser(null); 
     setModalOpen(true);
   };
 
-  // edirting user
   const openEditUserModal = (user) => {
     setEditingUser(user); 
     setModalOpen(true); 
   };
 
-  // Close the modal
   const closeModal = () => {
     setModalOpen(false); 
     setEditingUser(null); 
@@ -130,12 +120,18 @@ const UserManagementPage = () => {
                 onDelete={handleDeleteUser} 
               />
               {/* Pagination controls */}
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-4 px-2 md:px-0">
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalUsers}
                   onChange={handlePageChange}
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    justifyContent: 'center',
+                  }}
                 />
               </div>
             </>
@@ -143,7 +139,7 @@ const UserManagementPage = () => {
             <p>No users found.</p>
           )}
 
-          {/* Modal for adding editing a user */}
+          {/* Modal for adding/editing a user */}
           <Modal
             title={editingUser ? 'Edit User' : 'Add User'}
             open={modalOpen}

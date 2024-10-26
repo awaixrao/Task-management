@@ -38,9 +38,7 @@ const ProjectsPage = () => {
   const [formErrors, setFormErrors] = useState(null);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [userIdsToAssign, setUserIdsToAssign] = useState([]);
 
-  // Fetch projects based on user role
   useEffect(() => {
     if (role === "admin") {
       dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
@@ -48,8 +46,6 @@ const ProjectsPage = () => {
       dispatch(fetchUserProjects());
     }
   }, [dispatch, role, currentPage, pageSize]);
-
-  useEffect(() => {}, [adminProjects, userProjects]);
 
   useEffect(() => {
     if (adminError) {
@@ -68,7 +64,6 @@ const ProjectsPage = () => {
     }
   }, [adminError, userError, dispatch]);
 
-  // Handle actions add, edit, delete, assign only for admin
   const handleAddProject = async (newProject) => {
     if (role !== "admin") return;
     try {
@@ -118,30 +113,28 @@ const ProjectsPage = () => {
     });
   };
 
-  const handleAssignUsers = async (userIds) => {  // Add userIds parameter
+  const handleAssignUsers = async (userIds) => {
     if (role !== "admin") return;
     try {
-        await dispatch(
-            assignUsersToProject({
-                projectId: selectedProjectId,
-                userIds,
-            })
-        ).unwrap();
-        notification.success({
-            message: "Success",
-            description: "Users assigned successfully.",
-        });
-        setAssignModalOpen(false);
-        setUserIdsToAssign([]);
-        dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
+      await dispatch(
+        assignUsersToProject({
+          projectId: selectedProjectId,
+          userIds,
+        })
+      ).unwrap();
+      notification.success({
+        message: "Success",
+        description: "Users assigned successfully.",
+      });
+      setAssignModalOpen(false);
+      dispatch(fetchProjects({ page: currentPage, limit: pageSize }));
     } catch (err) {
-        notification.error({
-            message: "Error",
-            description: err.message || "Failed to assign users.",
-        });
+      notification.error({
+        message: "Error",
+        description: err.message || "Failed to assign users.",
+      });
     }
-};
-
+  };
 
   const handlePageChange = (page) => {
     if (role === "admin") {
@@ -180,7 +173,6 @@ const ProjectsPage = () => {
   const closeAssignModal = () => {
     setAssignModalOpen(false);
     setSelectedProjectId(null);
-    setUserIdsToAssign([]);
   };
 
   const isLoading = role === "admin" ? adminLoading : userLoading;
@@ -190,7 +182,6 @@ const ProjectsPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">Projects Management</h1>
 
-      {/* Show "Add Project" button only if the role is admin */}
       {role === "admin" && (
         <div className="flex justify-end mb-4">
           <Button
@@ -214,12 +205,19 @@ const ProjectsPage = () => {
                 onDelete={role === "admin" ? handleDeleteProject : null}
                 onAssign={role === "admin" ? openAssignUsersModal : null}
               />
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-4 px-2 md:px-0">
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalProjects}
                   onChange={handlePageChange}
+                  className="pagination-responsive"
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                    justifyContent: "center",
+                  }}
                 />
               </div>
             </>
@@ -227,7 +225,6 @@ const ProjectsPage = () => {
             <p>No projects found.</p>
           )}
 
-          {/* Modal for adding or editing project */}
           <EditProjectModal
             open={modalOpen}
             onClose={closeModal}
@@ -236,7 +233,6 @@ const ProjectsPage = () => {
             errors={formErrors}
           />
 
-          {/* Modal for assigning users */}
           <UserAssignmentModal
             open={assignModalOpen}
             onClose={closeAssignModal}

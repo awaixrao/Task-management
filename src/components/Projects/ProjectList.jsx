@@ -1,16 +1,19 @@
 import React from 'react';
 import { Table, Button, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, TeamOutlined, FileDoneOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery({ maxWidth: 768 }); // Detect mobile screen
 
   const columns = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      ellipsis: isMobile, // Enable ellipsis on mobile for compact view
     },
     {
       title: 'Description',
@@ -26,20 +29,21 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
     },
     {
       title: 'Actions',
+      key: 'actions',
       render: (_, project) => (
-        <div>
+        <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px' }}>
           <Button
             type="default"
             icon={<FileDoneOutlined />}
-            onClick={() => navigate(`/tasks/${project.id}`)} 
-            style={{ marginRight: '8px' }}
+            onClick={() => navigate(`/tasks/${project.id}`)}
+            style={{ padding: isMobile ? '4px 6px' : '6px 12px' }}
           />
           {onEdit && (
             <Button
               type="primary"
               icon={<EditOutlined />}
               onClick={() => onEdit(project)}
-              style={{ marginRight: '8px' }}
+              style={{ padding: isMobile ? '4px 6px' : '6px 12px' }}
             />
           )}
           {onDelete && (
@@ -52,7 +56,7 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
               <Button
                 type="danger"
                 icon={<DeleteOutlined />}
-                style={{ marginRight: '8px' }}
+                style={{ padding: isMobile ? '4px 6px' : '6px 12px' }}
               />
             </Popconfirm>
           )}
@@ -61,6 +65,7 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
               type="default"
               icon={<TeamOutlined />}
               onClick={() => onAssign(project.id)}
+              style={{ padding: isMobile ? '4px 6px' : '6px 12px' }}
             />
           )}
         </div>
@@ -69,12 +74,15 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
   ];
 
   return (
-    <Table
-      dataSource={projects}
-      columns={columns}
-      rowKey="id"
-      pagination={false}
-    />
+    <div style={{ overflowX: 'auto' }}>
+      <Table
+        dataSource={projects}
+        columns={columns}
+        rowKey="id"
+        pagination={false}
+        scroll={{ x: 600 }} // Enable horizontal scroll for table content on small screens
+      />
+    </div>
   );
 };
 

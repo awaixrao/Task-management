@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Card, Avatar, Space, Tooltip, Input, List } from 'antd'; // Added List here
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Card, Avatar, Space, Tooltip, Input, List, Dropdown, Menu } from 'antd'; // Added Menu and Dropdown
+import { EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
 
 const CommentCard = ({ comment, onEdit, onDelete, onReply, depth }) => {
   const [replyContent, setReplyContent] = useState('');
+  const [showReplyInput, setShowReplyInput] = useState(false); // State to toggle reply input
 
   const handleAddReply = () => {
     if (!replyContent.trim()) {
@@ -11,7 +12,23 @@ const CommentCard = ({ comment, onEdit, onDelete, onReply, depth }) => {
     }
     onReply(comment.id, replyContent);
     setReplyContent('');
+    setShowReplyInput(false); // Hide the reply input after submitting
   };
+
+  // Menu for edit, delete, and reply actions
+  const menu = (
+    <Menu>
+      <Menu.Item key="reply" onClick={() => setShowReplyInput(true)}>
+        Reply
+      </Menu.Item>
+      <Menu.Item key="edit" onClick={() => onEdit(comment)}>
+        Edit
+      </Menu.Item>
+      <Menu.Item key="delete" onClick={() => onDelete(comment.id)} danger>
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <Card
@@ -22,16 +39,6 @@ const CommentCard = ({ comment, onEdit, onDelete, onReply, depth }) => {
         backgroundColor: depth > 0 ? '#f7f7f7' : '#fff',
       }}
     >
-      <Tooltip title="Edit">
-        <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(comment)} className="text-blue-500 hover:text-blue-700" />
-      </Tooltip>
-      <Tooltip title="Delete">
-        <Button type="link" icon={<DeleteOutlined />} danger onClick={() => onDelete(comment.id)} className="text-red-500 hover:text-red-700" />
-      </Tooltip>
-      <span className="text-green-500 hover:text-green-700" onClick={() => onReply(comment.id)}>
-        Reply
-      </span>
-
       <List.Item.Meta
         avatar={<Avatar src="https://www.w3schools.com/howto/img_avatar.png" size={depth > 0 ? 'small' : 'default'} />}
         title={<span className="font-semibold">{comment.user?.username || 'Unknown User'}</span>}
@@ -43,21 +50,30 @@ const CommentCard = ({ comment, onEdit, onDelete, onReply, depth }) => {
         }
       />
 
+      {/* Three dots menu for actions */}
+      <div className="flex justify-between items-center mt-2">
+        <Tooltip title="More Options">
+          <Dropdown overlay={menu} trigger={['click']}>
+            <Button type="link" icon={<EllipsisOutlined />} />
+          </Dropdown>
+        </Tooltip>
+      </div>
+
       {/* Reply Input */}
-      {depth === 0 && (
-        <div className="flex items-center mt-4 bg-gray-50 p-2 rounded-lg shadow-sm">
+      {showReplyInput && (
+        <div className="flex flex-col mt-4 bg-gray-50 p-2 rounded-lg shadow-sm">
           <Input.TextArea
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             placeholder="Write your reply here..."
             autoSize={{ minRows: 1, maxRows: 4 }}
-            className="flex-1 rounded-md border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-100 transition duration-200"
+            className="rounded-md border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-100 transition duration-200 mb-2"
             style={{ fontSize: '12px' }} // Smaller font for reply input
           />
           <Button
             type="primary"
             size="small"
-            className="ml-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200"
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 w-full" // Full width button on small screens
             onClick={handleAddReply}
           >
             Add Reply

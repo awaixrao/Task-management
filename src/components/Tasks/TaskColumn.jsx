@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import TaskCard from './TaskCard';
-import TaskAssignmentModal from './TaskAssignModal'; 
+import TaskAssignmentModal from './TaskAssignModal';
+import SubtaskModal from './SubTaskModal';
 
 // Define column styles based on task status
 const columnStyles = {
@@ -13,22 +14,21 @@ const columnStyles = {
 };
 
 const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) => {
-  
-  
   // State to manage modal visibility and selected task
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [isSubtaskModalVisible, setSubtaskModalVisible] = useState(false); // State for Subtask Modal
 
   // Handle task assignment initiation
   const handleAssign = (task) => {
-    setSelectedTask(task);  
-    setModalVisible(true);  
+    setSelectedTask(task);
+    setModalVisible(true);
   };
 
   // Close the assignment modal
   const handleModalClose = () => {
     setModalVisible(false);
-    setSelectedTask(null);  
+    setSelectedTask(null);
   };
 
   // Handle submission of assignment data
@@ -37,13 +37,19 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
     handleModalClose();
   };
 
+  // Handle opening the subtask modal
+  const handleOpenSubtaskModal = (taskId) => {
+    setSelectedTask(taskId); // Set the taskId of the selected task
+    setSubtaskModalVisible(true); // Show the subtask modal
+  };
+
   return (
     <Droppable droppableId={status}>
       {(provided) => (
         <div
           ref={provided.innerRef}
           {...provided.droppableProps}
-          className={`flex flex-col p-4 rounded-lg shadow-lg ${columnStyles[status]} w-64`}
+          className={`flex flex-col p-4 rounded-lg shadow-lg ${columnStyles[status]} sm:w-64 w-full mb-4`}
         >
           <h2 className="font-bold text-lg mb-2 capitalize">{status}</h2>
           <div className="flex-1 overflow-y-auto">
@@ -54,10 +60,9 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
                 index={taskIndex}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onAssign={() => handleAssign(task)} 
-                userRole={userRole} 
+                onOpenSubtaskModal={handleOpenSubtaskModal} // Pass the function to open subtask modal
+                userRole={userRole}
                 projectId={projectId} // Ensure projectId is passed here
-
               />
             ))}
             {provided.placeholder}
@@ -73,6 +78,14 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
               projectId={projectId} // Pass projectId to the modal
             />
           )}
+
+          {/* Subtask Modal */}
+          <SubtaskModal
+            open={isSubtaskModalVisible}
+            onClose={() => setSubtaskModalVisible(false)}
+            taskId={selectedTask} // Pass the taskId for the subtask modal
+            projectId={projectId} // Pass the projectId to fetch subtasks
+          />
         </div>
       )}
     </Droppable>

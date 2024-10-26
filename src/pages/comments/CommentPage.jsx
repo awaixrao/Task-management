@@ -1,4 +1,3 @@
-// CommentsPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
@@ -86,11 +85,11 @@ const CommentsPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-gray-100 rounded-xl shadow-lg max-w-3xl">
+    <div className="container mx-auto p-4 sm:p-6 bg-gray-100 rounded-xl shadow-lg max-w-3xl">
       <h1 className="text-2xl font-semibold mb-6 text-center">Comments for Task {taskId}</h1>
 
       {/* Back to Task Link */}
-      <Link to={`/projects/${projectId}/tasks/${taskId}`}>
+      <Link to={`/tasks/${taskId}`}>
         <Button type="link" className="mb-4">
           Back to Task
         </Button>
@@ -113,9 +112,10 @@ const CommentsPage = () => {
       {/* Modal for Editing Comment */}
       <Modal
         title="Edit Comment"
-        open = {isModalOpen}
+        open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={handleEditComment}
+        style={{ maxWidth: '90%', margin: '0 auto' }} // Added to center and limit modal width
       >
         <Input.TextArea
           value={editingComment?.content}

@@ -83,7 +83,6 @@ export const deleteTask = createAsyncThunk(
   'tasks/deleteTask',
   async ({ projectId, taskId }, { rejectWithValue }) => {
     try {
-      console.log('Project ID:', projectId, 'Task ID:', taskId);
       await axios.delete(`${API_URL}/${projectId}/task/${taskId}`, {
         headers: {
           Accept: 'application/json',
@@ -93,7 +92,6 @@ export const deleteTask = createAsyncThunk(
       });
       return taskId;
     } catch (error) {
-      console.error('Delete Task Error:', error.response);
       return rejectWithValue(error.response?.data || { message: 'Failed to delete task' });
     }
   }
@@ -104,15 +102,17 @@ export const assignUsersToTask = createAsyncThunk(
   'tasks/assignUsersToTask',
   async ({ projectId, taskId, userIds }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/${projectId}/task/${taskId}/assign`, {
-        user_ids: userIds,
-      }, {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const response = await axios.post(
+        `${API_URL}/${projectId}/task/${taskId}/assign`,
+        { user_ids: userIds },
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to assign users to task' });
@@ -120,9 +120,29 @@ export const assignUsersToTask = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching subtasks of a specific task
+export const fetchSubtasks = createAsyncThunk(
+  'tasks/fetchSubtasks',
+  async ({ projectId, taskId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/${projectId}/task/${taskId}`, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: 'Failed to fetch subtasks' });
+    }
+  }
+);
+
 // Initial state
 const initialState = {
   tasks: [],
+  subtasks: [], // Added to store subtasks
   loading: false,
   error: null,
 };
@@ -214,10 +234,24 @@ const taskSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(assignUsersToTask.fulfilled, (state, action) => {
+      .addCase(assignUsersToTask.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(assignUsersToTask.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Handle fetchSubtasks
+      .addCase(fetchSubtasks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubtasks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subtasks = action.payload.data; // Store fetched subtasks
+      })
+      .addCase(fetchSubtasks.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

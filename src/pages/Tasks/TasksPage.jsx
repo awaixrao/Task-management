@@ -9,27 +9,31 @@ import {
   deleteTask,
   clearError,
   assignUsersToTask,
-} from '../../features/tasks/taskSlice'; 
-import { fetchUsers } from '../../features/users/userSlice'; 
+} from '../../features/tasks/taskSlice';
+import { fetchUsers } from '../../features/users/userSlice';
 import KanbanBoard from '../../components/Tasks/Kanban';
 import EditTaskModal from '../../components/Tasks/EditTaskModal';
 import TaskAssignmentModal from '../../components/Tasks/TaskAssignModal';
+import SubtaskModal from '../../components/Tasks/SubTaskModal'; // New modal for managing subtasks
 
 const TasksPage = () => {
   const dispatch = useDispatch();
-  const { id: projectId } = useParams();
+  const parems = useParams();
+  const projectId = parems.id
+
   
+
   const { tasks, loading: tasksLoading, error: tasksError } = useSelector((state) => state.tasks);
   const { users, loading: usersLoading, error: usersError } = useSelector((state) => state.users);
-  const { role: userRole } = useSelector((state) => state.auth); // Get user role from auth slice
+  const { role: userRole } = useSelector((state) => state.auth);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [formErrors, setFormErrors] = useState(null);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null); 
+  const [subtaskModalVisible, setSubtaskModalVisible] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
-  // Fetch tasks on component mount
   useEffect(() => {
     if (projectId) {
       dispatch(fetchTasks(projectId));
@@ -46,7 +50,6 @@ const TasksPage = () => {
     }
   }, [tasksError, dispatch]);
 
-  // Handle task add
   const handleAddTask = async (newTask) => {
     try {
       await dispatch(createTask({ projectId, taskData: newTask })).unwrap();
@@ -61,7 +64,6 @@ const TasksPage = () => {
     }
   };
 
-  // Handle task editing
   const handleEditTask = async (updatedTask) => {
     if (!editingTask) return;
     try {
@@ -78,7 +80,6 @@ const TasksPage = () => {
     }
   };
 
-  // Handle task deletion
   const handleDeleteTask = (taskId) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this task?',
@@ -100,12 +101,11 @@ const TasksPage = () => {
     });
   };
 
-  // Handle drag and drop
   const onDragEnd = async (result) => {
     const { destination, source } = result;
 
     if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
-      return; 
+      return;
     }
 
     const movedTask = tasks.find((task) => task.id.toString() === source.draggableId);
@@ -115,34 +115,35 @@ const TasksPage = () => {
     dispatch(fetchTasks(projectId));
   };
 
-  // Open the add task modal
   const openAddTaskModal = () => {
     setEditingTask(null);
     setModalOpen(true);
   };
 
-  // Open the edit task modal
   const openEditTaskModal = (task) => {
     setEditingTask(task);
     setModalOpen(true);
   };
 
-  // Close modal
+  const openSubtaskModal = (taskId) => {
+    setSelectedTaskId(taskId);
+    setSubtaskModalVisible(true);
+  };
+
   const closeModal = () => {
     setModalOpen(false);
     setEditingTask(null);
   };
 
-  // Handle user assignment to a task
   const handleAssignUser = async (data) => {
     try {
-      await dispatch(assignUsersToTask(data)).unwrap(); 
+      await dispatch(assignUsersToTask(data)).unwrap();
       notification.success({
         message: 'Success',
         description: 'User assigned to task successfully.',
       });
-      dispatch(fetchTasks(projectId)); 
-      closeAssignModal(); 
+      dispatch(fetchTasks(projectId));
+      closeAssignModal();
     } catch (err) {
       notification.error({
         message: 'Error',
@@ -151,24 +152,22 @@ const TasksPage = () => {
     }
   };
 
-  // Open user assignment modal with selected task ID
   const openAssignModal = (taskId) => {
-    setSelectedTaskId(taskId); 
+    setSelectedTaskId(taskId);
     setAssignModalVisible(true);
-    dispatch(fetchUsers({ page: 1, limit: 10 })); 
+    dispatch(fetchUsers({ page: 1, limit: 10 }));
   };
 
-  // Close assignment modal
   const closeAssignModal = () => {
     setAssignModalVisible(false);
-    setSelectedTaskId(null); 
+    setSelectedTaskId(null);
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">Task Management</h1>
       <div className="flex justify-end mb-4">
-        {userRole === 'admin' && ( // Only show button for admin role
+        {userRole === 'admin' && (
           <Button
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 text-lg rounded transition duration-300 ease-in-out"
             onClick={openAddTaskModal}
@@ -183,13 +182,13 @@ const TasksPage = () => {
         <>
           <KanbanBoard
             tasks={tasks}
-            onEdit={userRole === 'admin' ? openEditTaskModal : null} // Disable edit for non-admin
-            onDelete={userRole === 'admin' ? handleDeleteTask : null} // Disable delete for non-admin
+            onEdit={userRole === 'admin' ? openEditTaskModal : null}
+            onDelete={userRole === 'admin' ? handleDeleteTask : null}
             onDragEnd={onDragEnd}
-            onAssign={openAssignModal} 
-            userRole={userRole} // Pass user role to KanbanBoard
-            projectId={projectId} // Ensure projectId is passed here
-
+            onAssign={openAssignModal}
+            onShowSubtasks={openSubtaskModal} // Open subtask modal
+            userRole={userRole}
+            projectId={projectId}
           />
           <EditTaskModal
             visible={modalOpen}
@@ -202,11 +201,18 @@ const TasksPage = () => {
             visible={assignModalVisible}
             onClose={closeAssignModal}
             onSubmit={handleAssignUser}
-            taskId={selectedTaskId} 
+            taskId={selectedTaskId}
+          />
+          <SubtaskModal
+            visible={subtaskModalVisible}
+            onClose={() => setSubtaskModalVisible(false)}
+            taskId={selectedTaskId} // Pass selected task ID for subtasks
           />
         </>
       )}
-      {(tasksError || usersError) && <Alert message={tasksError?.message || usersError?.message} type="error" showIcon />}
+      {(tasksError || usersError) && (
+        <Alert message={tasksError?.message || usersError?.message} type="error" showIcon />
+      )}
     </div>
   );
 };
