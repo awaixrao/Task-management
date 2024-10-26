@@ -14,7 +14,7 @@ import { fetchUsers } from '../../features/users/userSlice';
 import KanbanBoard from '../../components/Tasks/Kanban';
 import EditTaskModal from '../../components/Tasks/EditTaskModal';
 import TaskAssignmentModal from '../../components/Tasks/TaskAssignModal';
-import SubtaskModal from '../../components/Tasks/SubTaskModal'; // New modal for managing subtasks
+import SubtaskModal from '../../components/Tasks/SubTaskModal'; 
 
 const TasksPage = () => {
   const dispatch = useDispatch();
@@ -186,7 +186,7 @@ const TasksPage = () => {
             onDelete={userRole === 'admin' ? handleDeleteTask : null}
             onDragEnd={onDragEnd}
             onAssign={openAssignModal}
-            onShowSubtasks={openSubtaskModal} // Open subtask modal
+            onShowSubtasks={openSubtaskModal} 
             userRole={userRole}
             projectId={projectId}
           />
@@ -206,7 +206,7 @@ const TasksPage = () => {
           <SubtaskModal
             visible={subtaskModalVisible}
             onClose={() => setSubtaskModalVisible(false)}
-            taskId={selectedTaskId} // Pass selected task ID for subtasks
+            taskId={selectedTaskId} 
           />
         </>
       )}

@@ -3,7 +3,7 @@ import { Table, Button } from 'antd';
 import { useMediaQuery } from 'react-responsive';
 
 const UserList = ({ users, onEdit, onDelete }) => {
-  const isMobile = useMediaQuery({ maxWidth: 768 }); // Check if screen width is <= 768px
+  const isMobile = useMediaQuery({ maxWidth: 768 }); 
 
   const columns = [
     {
@@ -52,7 +52,7 @@ const UserList = ({ users, onEdit, onDelete }) => {
         columns={columns}
         rowKey="id"
         pagination={false}
-        scroll={{ x: 800 }} // Enable horizontal scroll
+        scroll={{ x: 800 }}
       />
     </div>
   );

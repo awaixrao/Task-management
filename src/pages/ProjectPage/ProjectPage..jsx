@@ -153,7 +153,7 @@ const ProjectsPage = () => {
     }
   };
 
-  const openAssignUsersModal = (projectId) => { 
+  const openAssignUsersModal = (projectId) => {
     if (role === "admin") {
       setSelectedProjectId(projectId);
       setAssignModalOpen(true);
@@ -201,12 +201,18 @@ const ProjectsPage = () => {
                 onDelete={role === "admin" ? handleDeleteProject : null}
                 onAssign={role === "admin" ? openAssignUsersModal : null}
               />
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-4 px-2 md:px-0">
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalProjects}
                   onChange={handlePageChange}
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    justifyContent: 'center',
+                  }}
                 />
               </div>
             </>

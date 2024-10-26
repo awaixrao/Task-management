@@ -19,7 +19,6 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
     }
   }, [dispatch, searchTerm, currentPage]);
 
-  // Reset state when modal visibility changes
   useEffect(() => {
     if (!visible) {
       resetState();
@@ -35,7 +34,7 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on new search
+    setCurrentPage(1); 
   };
 
   const handleScroll = (e) => {
@@ -53,7 +52,7 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
 
   const handleSubmit = () => {
     onSubmit(userIds);
-    resetState(); // Reset state after submission
+    resetState(); 
   };
 
   return (
@@ -64,7 +63,7 @@ const UserAssignmentModal = ({ visible, onClose, onSubmit }) => {
       onCancel={onClose}
       okText="Assign"
       cancelText="Cancel"
-      destroyOnClose // This will destroy the modal component when closed
+      destroyOnClose 
     >
       <Input
         placeholder="Search users..."

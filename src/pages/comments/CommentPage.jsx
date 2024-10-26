@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
-import { Button, notification, Modal, Input } from 'antd'; // Added Input here
+import { Button, notification, Modal, Input } from 'antd'; 
 import { fetchComments, addComment, deleteComment, updateComment } from '../../features/comments/commentSlice';
 import CommentList from '../../components/comments/CommentList';
 import NewCommentForm from '../../components/comments/NewCommentForm';
@@ -88,14 +88,14 @@ const CommentsPage = () => {
     <div className="container mx-auto p-4 sm:p-6 bg-gray-100 rounded-xl shadow-lg max-w-3xl">
       <h1 className="text-2xl font-semibold mb-6 text-center">Comments for Task {taskId}</h1>
 
-      {/* Back to Task Link */}
+      {/* Back to taks */}
       <Link to={`/tasks/${taskId}`}>
         <Button type="link" className="mb-4">
           Back to Task
         </Button>
       </Link>
 
-      {/* Comments List */}
+      {/* Comments */}
       <CommentList
         comments={comments}
         onEdit={(comment) => {
@@ -106,16 +106,16 @@ const CommentsPage = () => {
         onReply={handleAddReply}
       />
 
-      {/* New Comment Input */}
+      {/* new comment */}
       <NewCommentForm onAdd={handleAddComment} />
 
-      {/* Modal for Editing Comment */}
+      {/*  editing comment */}
       <Modal
         title="Edit Comment"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={handleEditComment}
-        style={{ maxWidth: '90%', margin: '0 auto' }} // Added to center and limit modal width
+        style={{ maxWidth: '90%', margin: '0 auto' }} 
       >
         <Input.TextArea
           value={editingComment?.content}

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../features/auth/AuthSlice';
@@ -28,10 +27,12 @@ const LoginPage = () => {
   }, [error]);
 
   return (
-    <div className="flex h-screen">
+    <div className="flex  h-screen">
       <BackgroundImage />
-      <div className="w-full md:w-1/2 flex items-center justify-center p-4">
-        <LoginForm onFinish={handleLogin} loading={loading} />
+      <div className="w-full md:w-1/2 bg-slate-200 flex items-center justify-center p-4">
+        <div className="w-full  max-w-xs sm:max-w-sm   p-6 rounded-lg shadow-lg">
+          <LoginForm onFinish={handleLogin} loading={loading} />
+        </div>
       </div>
     </div>
   );

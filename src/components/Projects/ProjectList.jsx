@@ -6,14 +6,14 @@ import { useMediaQuery } from 'react-responsive';
 
 const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery({ maxWidth: 768 }); // Detect mobile screen
+  const isMobile = useMediaQuery({ maxWidth: 768 }); 
 
   const columns = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      ellipsis: isMobile, // Enable ellipsis on mobile for compact view
+      ellipsis: isMobile, 
     },
     {
       title: 'Description',
@@ -64,7 +64,7 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
             <Button
               type="default"
               icon={<TeamOutlined />}
-              onClick={() => onAssign(project.id)} // Trigger onAssign when clicked
+              onClick={() => onAssign(project.id)} 
               style={{ padding: isMobile ? '4px 6px' : '6px 12px' }}
             />
           )}
@@ -80,7 +80,7 @@ const ProjectList = ({ projects, onEdit, onDelete, onAssign }) => {
         columns={columns}
         rowKey="id"
         pagination={false}
-        scroll={{ x: 600 }} // Enable horizontal scroll for table content on small screens
+        scroll={{ x: 600 }} 
       />
     </div>
   );

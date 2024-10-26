@@ -4,7 +4,7 @@ import TaskCard from './TaskCard';
 import TaskAssignmentModal from './TaskAssignModal';
 import SubtaskModal from './SubTaskModal';
 
-// Define column styles based on task status
+// columns
 const columnStyles = {
   todo: 'bg-blue-300',
   'in-progress': 'bg-yellow-300',
@@ -14,33 +14,28 @@ const columnStyles = {
 };
 
 const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) => {
-  // State to manage modal visibility and selected task
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [isSubtaskModalVisible, setSubtaskModalVisible] = useState(false); // State for Subtask Modal
+  const [isSubtaskModalVisible, setSubtaskModalVisible] = useState(false); 
 
-  // Handle task assignment initiation
   const handleAssign = (task) => {
     setSelectedTask(task);
     setModalVisible(true);
   };
 
-  // Close the assignment modal
   const handleModalClose = () => {
     setModalVisible(false);
     setSelectedTask(null);
   };
 
-  // Handle submission of assignment data
   const handleAssignSubmit = (assignmentData) => {
     console.log('Assigned users:', assignmentData);
     handleModalClose();
   };
 
-  // Handle opening the subtask modal
   const handleOpenSubtaskModal = (taskId) => {
-    setSelectedTask(taskId); // Set the taskId of the selected task
-    setSubtaskModalVisible(true); // Show the subtask modal
+    setSelectedTask(taskId); 
+    setSubtaskModalVisible(true);
   };
 
   return (
@@ -60,9 +55,9 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
                 index={taskIndex}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onOpenSubtaskModal={handleOpenSubtaskModal} // Pass the function to open subtask modal
+                onOpenSubtaskModal={handleOpenSubtaskModal} 
                 userRole={userRole}
-                projectId={projectId} // Ensure projectId is passed here
+                projectId={projectId} 
               />
             ))}
             {provided.placeholder}
@@ -75,7 +70,7 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
               onClose={handleModalClose}
               onSubmit={handleAssignSubmit}
               taskId={selectedTask.id}
-              projectId={projectId} // Pass projectId to the modal
+              projectId={projectId} 
             />
           )}
 
@@ -83,8 +78,8 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
           <SubtaskModal
             open={isSubtaskModalVisible}
             onClose={() => setSubtaskModalVisible(false)}
-            taskId={selectedTask} // Pass the taskId for the subtask modal
-            projectId={projectId} // Pass the projectId to fetch subtasks
+            taskId={selectedTask} 
+            projectId={projectId} 
           />
         </div>
       )}

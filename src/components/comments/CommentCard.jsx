@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { Button, Card, Avatar, Space, Tooltip, Input, List, Dropdown, Menu } from 'antd'; // Added Menu and Dropdown
+import { Button, Card, Avatar, Space, Tooltip, Input, List, Dropdown, Menu } from 'antd'; 
 import { EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
 
 const CommentCard = ({ comment, onEdit, onDelete, onReply, depth }) => {
   const [replyContent, setReplyContent] = useState('');
-  const [showReplyInput, setShowReplyInput] = useState(false); // State to toggle reply input
-
+  const [showReplyInput, setShowReplyInput] = useState(false);
+  
   const handleAddReply = () => {
     if (!replyContent.trim()) {
       return;
     }
     onReply(comment.id, replyContent);
     setReplyContent('');
-    setShowReplyInput(false); // Hide the reply input after submitting
+    setShowReplyInput(false); 
   };
 
   // Menu for edit, delete, and reply actions
@@ -68,7 +68,7 @@ const CommentCard = ({ comment, onEdit, onDelete, onReply, depth }) => {
             placeholder="Write your reply here..."
             autoSize={{ minRows: 1, maxRows: 4 }}
             className="rounded-md border border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-100 transition duration-200 mb-2"
-            style={{ fontSize: '12px' }} // Smaller font for reply input
+            style={{ fontSize: '12px' }} 
           />
           <Button
             type="primary"

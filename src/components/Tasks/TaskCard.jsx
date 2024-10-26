@@ -32,12 +32,12 @@ const TaskCard = ({ task, index, onEdit, onDelete, onOpenSubtaskModal, projectId
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className="bg-white rounded-lg shadow-md p-3 mb-2 cursor-pointer hover:shadow-lg transition"
-          style={{ width: '100%' }} // Ensure card takes full width for responsiveness
+          style={{ width: '100%' }} 
         >
           <h3 className="font-semibold">{task.name}</h3>
           <p className="text-gray-600">{task.description}</p>
           <div className="flex justify-between items-center mt-2">
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
               <EllipsisOutlined className="text-gray-500 text-lg hover:text-gray-600 cursor-pointer" title="More Options" />
             </Dropdown>
           </div>
