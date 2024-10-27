@@ -25,7 +25,8 @@ const App = () => {
       <Route path="login" element={<ProtectedRoute element={<LoginPage />} isPublic={true} />} />
       <Route path="signup" element={<ProtectedRoute element={<SignupPage />} isPublic={true} />} />
 
-      {/* Routes that use MainOutlet for common layout */}
+
+
       <Route path="/"  element={<ProtectedRoute element={<MainOutlet />}/>}>
         <Route path="dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
         <Route path="projects" element={<ProtectedRoute element={<ProjectsPage />} />} />

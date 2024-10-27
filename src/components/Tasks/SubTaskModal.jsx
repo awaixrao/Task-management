@@ -17,13 +17,12 @@ const SubtaskModal = ({ open, onClose, projectId, taskId }) => {
         }
     }, [open, taskId, dispatch, projectId]);
 
-    // Handle creating/updating a subtask
     const handleCreateSubtask = async (values) => {
         try {
             await dispatch(createTask({ parent_id: taskId, project_id: projectId, ...values }));
             notification.success({ message: 'Success', description: 'Subtask created successfully.' });
             form.resetFields();
-            dispatch(fetchSubtasks({ projectId, taskId })); // Refresh subtasks after creation
+            dispatch(fetchSubtasks({ projectId, taskId }));
         } catch (err) {
             notification.error({ message: 'Error', description: err.message });
         }
@@ -37,7 +36,7 @@ const SubtaskModal = ({ open, onClose, projectId, taskId }) => {
             notification.success({ message: 'Success', description: 'Subtask updated successfully.' });
             setEditingSubtask(null);
             form.resetFields();
-            dispatch(fetchSubtasks({ projectId, taskId })); // Refresh subtasks after update
+            dispatch(fetchSubtasks({ projectId, taskId })); 
         } catch (err) {
             notification.error({ message: 'Error', description: err.message });
         }
@@ -47,17 +46,16 @@ const SubtaskModal = ({ open, onClose, projectId, taskId }) => {
         try {
             await dispatch(deleteTask({ projectId, taskId: subtaskId }));
             notification.success({ message: 'Success', description: 'Subtask deleted successfully.' });
-            dispatch(fetchSubtasks({ projectId, taskId })); // Refresh subtasks after deletion
+            dispatch(fetchSubtasks({ projectId, taskId })); 
         } catch (err) {
             notification.error({ message: 'Error', description: err.message });
         }
     };
 
-    // Reset states on modal close
     const handleClose = () => {
         onClose();
         setEditingSubtask(null);
-        form.resetFields(); // Reset form fields
+        form.resetFields(); 
     };
 
     return (
@@ -82,7 +80,7 @@ const SubtaskModal = ({ open, onClose, projectId, taskId }) => {
                 <p>Loading subtasks...</p>
             ) : (
                 <List
-                    dataSource={Array.isArray(subtasks) ? subtasks : []} // Ensure subtasks is an array
+                    dataSource={Array.isArray(subtasks) ? subtasks : []} 
                     renderItem={(subtask) => (
                         <List.Item
                             actions={[

@@ -1,4 +1,3 @@
-// src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -47,13 +46,7 @@ export const register = createAsyncThunk(
         },
       });
 
-      const { token, user } = response.data.data;
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('userRole', user.role);
-
-      return { user, token, role: user.role };
+      return { message: 'Registration successful!' };
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: 'Registration failed. Please try again.' }
@@ -69,6 +62,7 @@ const initialState = {
   role: localStorage.getItem('userRole') || null,
   loading: false,
   error: null,
+  signupSuccess: false, 
 };
 
 const authSlice = createSlice({
@@ -90,6 +84,9 @@ const authSlice = createSlice({
       state.role = action.payload;
       localStorage.setItem('userRole', action.payload);
     },
+    clearSignupSuccess: (state) => {
+      state.signupSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -102,8 +99,6 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.role = action.payload.role;
-        localStorage.setItem('user', JSON.stringify(action.payload.user)); 
-        localStorage.setItem('userRole', action.payload.role);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -112,22 +107,20 @@ const authSlice = createSlice({
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.signupSuccess = false;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.role = action.payload.role;
-        localStorage.setItem('user', JSON.stringify(action.payload.user)); 
-        localStorage.setItem('userRole', action.payload.role);
+        state.signupSuccess = true; 
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.signupSuccess = false;
       });
   },
 });
 
-export const { logout, clearError, setUserRole } = authSlice.actions;
+export const { logout, clearError, setUserRole, clearSignupSuccess } = authSlice.actions;
 
 export default authSlice.reducer;

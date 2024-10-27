@@ -3,7 +3,6 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import TaskColumn from './TaskColumn';
 
 const KanbanBoard = ({ tasks, onEdit, onDelete, onDragEnd, projectId, userRole }) => { 
-// Added userRole here
   const taskStatuses = ['todo', 'in-progress', 'testing', 'hold', 'completed'];
 
   return (
@@ -17,8 +16,8 @@ const KanbanBoard = ({ tasks, onEdit, onDelete, onDragEnd, projectId, userRole }
             index={index}
             onEdit={onEdit}
             onDelete={onDelete}
-            projectId={projectId} // Pass projectId to TaskColumn
-            userRole={userRole} // Pass userRole to TaskColumn
+            projectId={projectId} 
+            userRole={userRole} 
           />
         ))}
       </div>

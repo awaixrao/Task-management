@@ -1,17 +1,15 @@
-// src/pages/SignupPage.js
-
 import React, { useEffect } from 'react';
 import BackgroundImage from '../../components/common/BackgroundIamge';
 import SignUpForm from '../../components/SigunpForm'; 
 import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../../features/auth/AuthSlice'; 
+import { register, clearSignupSuccess } from '../../features/auth/AuthSlice'; 
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const SignupPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, user } = useSelector((state) => state.auth);
+  const { loading, error, signupSuccess } = useSelector((state) => state.auth);
 
   const handleSignUp = (values) => {
     dispatch(register(values));
@@ -21,11 +19,12 @@ const SignupPage = () => {
     if (error) {
       message.error(error.message || 'Signup failed. Please try again.');
     }
-    if (user) {
+    if (signupSuccess) {
       message.success('Signup successful! Redirecting to login...');
       navigate('/login'); 
+      dispatch(clearSignupSuccess());
     }
-  }, [error, user, navigate]);
+  }, [error, signupSuccess, navigate, dispatch]);
 
   return (
     <div className="flex h-screen">
