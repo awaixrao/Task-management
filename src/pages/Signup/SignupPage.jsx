@@ -29,7 +29,7 @@ const SignupPage = () => {
   return (
     <div className="flex h-screen">
       <BackgroundImage />
-      <div className="w-full md:w-1/2 flex items-center justify-center p-4">
+      <div className="w-full md:w-1/2 flex  bg-slate-200  items-center justify-center p-4">
         <SignUpForm onSignUp={handleSignUp} loading={loading} />
       </div>
     </div>
