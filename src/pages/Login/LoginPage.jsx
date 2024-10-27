@@ -30,7 +30,7 @@ const LoginPage = () => {
     <div className="flex  h-screen">
       <BackgroundImage />
       <div className="w-full md:w-1/2 bg-slate-200 flex items-center justify-center p-4">
-        <div className="w-full  max-w-xs sm:max-w-sm   p-6 rounded-lg shadow-lg">
+        <div className="w-full  max-w-xs sm:max-w-sm    rounded-lg shadow-lg">
           <LoginForm onFinish={handleLogin} loading={loading} />
         </div>
       </div>
