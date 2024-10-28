@@ -12,6 +12,7 @@ import UserManagementPage from './pages/userManagement/UserManagementPage';
 import ProfileUpdatePage from './pages/profile/ProfileUpdatePage';
 import TasksPage from './pages/Tasks/TasksPage';
 import CommentsPage from './pages/comments/CommentPage';
+import NotFound from './pages/notfound/NotFound';
 
 const App = () => {
 
@@ -35,7 +36,9 @@ const App = () => {
         <Route path="tasks/:id?" element={<ProtectedRoute element={<TasksPage />} />} />
         <Route path="projects/:projectId/tasks/:taskId/comments" element={<ProtectedRoute element={<CommentsPage />} />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
     </Routes>
+
   );
 };
 
