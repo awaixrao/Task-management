@@ -16,7 +16,7 @@ const EditTaskModal = ({ visible, onClose, onSubmit, task, errors }) => {
         status: task.status,
       });
     } else {
-
+      form.resetFields();
     }
   }, [task, form]);
 

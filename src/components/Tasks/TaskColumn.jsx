@@ -50,8 +50,8 @@ const TaskColumn = ({ status, tasks, onEdit, onDelete, projectId, userRole }) =>
           <div className="flex-1 overflow-y-auto">
             {tasks.map((task, taskIndex) => (
               <TaskCard
-                key={task.id}
-                task={task}
+              key={task.id.toString()}
+              task={task}
                 index={taskIndex}
                 onEdit={onEdit}
                 onDelete={onDelete}

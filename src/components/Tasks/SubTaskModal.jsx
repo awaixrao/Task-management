@@ -1,104 +1,171 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Button, Form, Input, notification, List } from 'antd';
+import { Modal, Button, Form, Input, DatePicker, Select, notification, List } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { createTask, updateTask, deleteTask, fetchSubtasks } from '../../features/tasks/taskSlice'; 
+import { useParams } from 'react-router-dom';
+import { createTask, updateTask, deleteTask, fetchSubtasks } from '../../features/tasks/taskSlice';
+import moment from 'moment';
 
-const SubtaskModal = ({ open, onClose, projectId, taskId }) => {
+const { Option } = Select;
+
+const SubtaskModal = ({ open, onClose, taskId }) => {
     const dispatch = useDispatch();
-    const { subtasks, loading } = useSelector((state) => state.tasks);
+    const { id: projectId } = useParams();
+    const userRole = useSelector((state) => state.auth.user.role);
+
+    const subtasksData = useSelector((state) => state.tasks.subtasks.subtasks);
+    const loading = useSelector((state) => state.tasks.loading);
     const [form] = Form.useForm();
     const [editingSubtask, setEditingSubtask] = useState(null);
 
-    // Fetch subtasks when modal is opened
     useEffect(() => {
-        if (open && taskId) {
-            console.log('Fetching subtasks...', { projectId, taskId });
-            dispatch(fetchSubtasks({ projectId, taskId }));
+        if (open && taskId && projectId) {
+            dispatch(fetchSubtasks({ projectId, taskId })).catch((error) => {
+                notification.error({ message: "Failed to fetch subtasks", description: error.message });
+            });
         }
-    }, [open, taskId, dispatch, projectId]);
+    }, [open, taskId, projectId, dispatch]);
 
-    const handleCreateSubtask = async (values) => {
+    const handleFormSubmit = async (values) => {
         try {
-            await dispatch(createTask({ parent_id: taskId, project_id: projectId, ...values }));
-            notification.success({ message: 'Success', description: 'Subtask created successfully.' });
+            const formattedData = {
+                name: values.name,
+                description: values.description,
+                due_date: values.due_date.format("YYYY-MM-DD"),
+                status: values.status,
+                parent_id: taskId,
+            };
+
+            if (editingSubtask) {
+                await dispatch(updateTask({ taskId: editingSubtask.id, taskData: formattedData })).unwrap();
+                notification.success({ message: 'Subtask updated successfully.' });
+            } else {
+                await dispatch(createTask({ projectId, taskData: formattedData }));
+                notification.success({ message: 'Subtask created successfully.' });
+            }
+
             form.resetFields();
-            dispatch(fetchSubtasks({ projectId, taskId }));
-        } catch (err) {
-            notification.error({ message: 'Error', description: err.message });
-        }
-    };
-
-    const handleEditSubtask = async (values) => {
-        if (!editingSubtask) return;
-
-        try {
-            await dispatch(updateTask({ taskId: editingSubtask.id, taskData: { ...values, parent_id: taskId, project_id: projectId } })).unwrap();
-            notification.success({ message: 'Success', description: 'Subtask updated successfully.' });
             setEditingSubtask(null);
-            form.resetFields();
-            dispatch(fetchSubtasks({ projectId, taskId })); 
+            dispatch(fetchSubtasks({ projectId, taskId }));
         } catch (err) {
-            notification.error({ message: 'Error', description: err.message });
+            handleError(err);
         }
     };
 
     const handleDeleteSubtask = async (subtaskId) => {
         try {
             await dispatch(deleteTask({ projectId, taskId: subtaskId }));
-            notification.success({ message: 'Success', description: 'Subtask deleted successfully.' });
-            dispatch(fetchSubtasks({ projectId, taskId })); 
+            notification.success({ message: 'Subtask deleted successfully.' });
+            dispatch(fetchSubtasks({ projectId, taskId }));
         } catch (err) {
-            notification.error({ message: 'Error', description: err.message });
+            handleError(err);
         }
+    };
+
+    const handleError = (error) => {
+        const errorMessage = error.response?.data?.message || "Failed to perform the operation.";
+        notification.error({ message: errorMessage });
     };
 
     const handleClose = () => {
         onClose();
         setEditingSubtask(null);
-        form.resetFields(); 
+        form.resetFields();
+    };
+
+    const handleEditClick = (subtask) => {
+        setEditingSubtask(subtask);
+        form.setFieldsValue({
+            ...subtask,
+            due_date: moment(subtask.due_date),
+        });
     };
 
     return (
-        <Modal title="Manage Subtasks" open={open} onCancel={onClose} footer={null}>
-            <Form
-                form={form}
-                onFinish={editingSubtask ? handleEditSubtask : handleCreateSubtask}
-            >
-                <Form.Item name="name" rules={[{ required: true, message: 'Please input the subtask name!' }]}>
-                    <Input placeholder="Subtask Name" />
-                </Form.Item>
-                <Form.Item name="description" rules={[{ required: true, message: 'Please input the subtask description!' }]}>
-                    <Input.TextArea placeholder="Subtask Description" />
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">
-                        {editingSubtask ? 'Update Subtask' : 'Create Subtask'}
+        <Modal title="Manage Subtasks" open={open} onCancel={handleClose} footer={null}>
+            {userRole === "admin" && (
+                <div className="mb-4 flex justify-end">
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setEditingSubtask(null);
+                            form.resetFields();
+                        }}
+                    >
+                        Add Subtask
                     </Button>
-                </Form.Item>
-            </Form>
+                </div>
+            )}
+
+            {userRole === "admin" && (
+                <Form form={form} onFinish={handleFormSubmit}>
+                    <Form.Item name="name" rules={[{ required: true, message: 'Please input the subtask name!' }]}>
+                        <Input placeholder="Subtask Name" />
+                    </Form.Item>
+                    <Form.Item name="description" rules={[{ required: true, message: 'Please input the subtask description!' }]}>
+                        <Input.TextArea placeholder="Subtask Description" />
+                    </Form.Item>
+                    <Form.Item name="due_date" rules={[{ required: true, message: 'Please select the due date!' }]}>
+                        <DatePicker placeholder="Select Due Date" format="YYYY-MM-DD" />
+                    </Form.Item>
+                    <Form.Item name="status" rules={[{ required: true, message: 'Please select the status!' }]}>
+                        <Select placeholder="Select Status">
+                            <Option value="todo">To Do</Option>
+                            <Option value="in-progress">In Progress</Option>
+                            <Option value="testing">Testing</Option>
+                            <Option value="hold">On Hold</Option>
+                            <Option value="completed">Completed</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit">
+                            {editingSubtask ? 'Update Subtask' : 'Create Subtask'}
+                        </Button>
+                        {editingSubtask && (
+                            <Button
+                                type="default"
+                                onClick={() => {
+                                    setEditingSubtask(null);
+                                    form.resetFields();
+                                }}
+                                style={{ marginLeft: '10px' }}
+                            >
+                                Cancel Edit
+                            </Button>
+                        )}
+                    </Form.Item>
+                </Form>
+            )}
             {loading ? (
                 <p>Loading subtasks...</p>
             ) : (
                 <List
-                    dataSource={Array.isArray(subtasks) ? subtasks : []} 
+                    dataSource={Array.isArray(subtasksData) ? subtasksData : []}
                     renderItem={(subtask) => (
                         <List.Item
-                            actions={[
-                                <Button onClick={() => handleDeleteSubtask(subtask.id)}>Delete</Button>,
-                                <Button onClick={() => {
-                                    setEditingSubtask(subtask);
-                                    form.setFieldsValue(subtask);
-                                }}>Edit</Button>,
-                            ]}
+                            actions={
+                                userRole === "admin"
+                                    ? [
+                                        <Button onClick={() => handleDeleteSubtask(subtask.id)}>Delete</Button>,
+                                        <Button onClick={() => handleEditClick(subtask)}>Edit</Button>,
+                                    ]
+                                    : []
+                            }
                         >
-                            {subtask.name}
+                            <List.Item.Meta
+                                title={subtask.name}
+                                description={
+                                    <>
+                                        <p>{subtask.description}</p>
+                                        <p>Status: {subtask.status}</p>
+                                    </>
+                                }
+                            />
                         </List.Item>
                     )}
                 />
             )}
         </Modal>
     );
-    
 };
 
 export default SubtaskModal;

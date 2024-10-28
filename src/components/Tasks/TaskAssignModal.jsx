@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Input, List, Spin } from 'antd';
+import { Modal, Input, List, Spin, notification } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '../../features/users/userSlice'; 
+import { fetchUsers } from '../../features/users/userSlice';
+import { assignUsersToTask } from '../../features/tasks/taskSlice';
+import { useParams } from 'react-router-dom';
 
-const TaskAssignmentModal = ({ visible, onClose, onSubmit, taskId }) => {
+const TaskAssignmentModal = ({ visible, onClose, taskId }) => {
   const dispatch = useDispatch();
   const { users, loading, totalUsers } = useSelector((state) => state.users);
-  
+  const { id: projectId } = useParams();
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [userIds, setUserIds] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null); 
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
@@ -20,19 +23,22 @@ const TaskAssignmentModal = ({ visible, onClose, onSubmit, taskId }) => {
 
   useEffect(() => {
     if (!visible) {
-      setSearchTerm('');
-      setUserIds([]);
-      setCurrentPage(1);
-      setHasMore(true);
+      resetState();
     }
   }, [visible]);
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); 
+  const resetState = () => {
+    setSearchTerm('');
+    setSelectedUserId(null);
+    setCurrentPage(1);
+    setHasMore(true);
   };
 
-  // Handle scrolling for pagination
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight === e.target.scrollTop + e.target.clientHeight;
     if (bottom && hasMore && !loading) {
@@ -40,21 +46,29 @@ const TaskAssignmentModal = ({ visible, onClose, onSubmit, taskId }) => {
     }
   };
 
-  const handleUserToggle = (userId) => {
-    setUserIds((prev) => 
-      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
-    );
+  const handleUserSelect = (userId) => {
+    setSelectedUserId(userId);
   };
 
-  // Handle submission
-  const handleSubmit = () => {
-    onSubmit({ taskId, userIds }); 
-    onClose(); 
+  const handleSubmit = async () => {
+    if (!selectedUserId) {
+      notification.warning({ message: 'Please select a user to assign.' });
+      return;
+    }
+    
+    try {
+      console.log("Assigning User to Task:", { projectId, taskId, assignee_id: selectedUserId });
+      await dispatch(assignUsersToTask({ projectId, taskId, assignee_id: selectedUserId })).unwrap();
+      notification.success({ message: 'User assigned successfully.' });
+      onClose();
+    } catch (error) {
+      notification.error({ message: 'Failed to assign user', description: error.message });
+    }
   };
 
   return (
     <Modal
-      title="Assign Users to Task"
+      title="Assign User to Task"
       open={visible}
       onOk={handleSubmit}
       onCancel={onClose}
@@ -62,7 +76,7 @@ const TaskAssignmentModal = ({ visible, onClose, onSubmit, taskId }) => {
       cancelText="Cancel"
     >
       <Input
-        placeholder="Search users..."
+        placeholder="Search users"
         value={searchTerm}
         onChange={handleSearchChange}
       />
@@ -75,8 +89,11 @@ const TaskAssignmentModal = ({ visible, onClose, onSubmit, taskId }) => {
           dataSource={users}
           renderItem={(user) => (
             <List.Item
-              onClick={() => handleUserToggle(user.id)}
-              style={{ cursor: 'pointer', backgroundColor: userIds.includes(user.id) ? '#e6f7ff' : 'transparent' }}
+              onClick={() => handleUserSelect(user.id)}
+              style={{ 
+                cursor: 'pointer', 
+                backgroundColor: selectedUserId === user.id ? '#e6f7ff' : 'transparent' 
+              }}
             >
               {user.name}
             </List.Item>
